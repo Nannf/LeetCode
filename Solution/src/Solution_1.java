@@ -2,7 +2,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author X5442(时子成)
+ * @author Nannf
  * @date 2020/5/28 17:51
  * @description <p>
  * Given an array of integers, return indices of the two numbers such that they add up to a specific target.
@@ -74,6 +74,7 @@ public class Solution_1 {
 //                return new int[] {i,map.get(anotherNum)};
 //            }
             int anotherNum = target - nums[i];
+            // 找到另一个值存不存在,且索引不是本此循环的索引即可
             if(map.containsKey(anotherNum) && i != map.get(anotherNum)) {
                 return new int[]{i,map.get(anotherNum)};
             }
