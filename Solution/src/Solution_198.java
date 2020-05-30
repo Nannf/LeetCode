@@ -14,7 +14,17 @@
  *
  */
 public class Solution_198 {
+    // 穷举出所有的下标可能性，以及数值的和，获取出最大的那个
+    // 难点在于 穷举出所有的可能性，并不是稳定的隔一个取一个，可以隔两个，只要不相邻
+    // 你管这这叫简单？？？？？
     public int rob(int[] nums) {
+        int maxNum = 0;
+        for (int i = 0 ; i < nums.length; i++) {
+            int tmpSum = 0;
+            for (int j  = i+2; j<nums.length ;) {
+                tmpSum += nums[i]+nums[j];
+            }
+        }
         return 0;
     }
 }

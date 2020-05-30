@@ -14,6 +14,25 @@ public class Solution_206 {
     }
 
     // 递归的实现
+
+    /**
+     * reverseList: head=1
+     *     reverseList: head=2
+     * 	    reverseList: head=3
+     * 		    reverseList:head=4
+     * 			    reverseList:head=5
+     * 					终止返回
+     * 				cur = 5
+     * 				4.next.next->4，即5->4
+     * 			cur=5
+     * 			3.next.next->3，即4->3
+     * 		cur = 5
+     * 		2.next.next->2，即3->2
+     * 	cur = 5
+     * 	1.next.next->1，即2->1
+     * @param head
+     * @return
+     */
     public ListNode reverseList(ListNode head) {
         // 递归的终止条件
         if (head == null || head.next == null) {
