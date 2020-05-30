@@ -59,6 +59,36 @@ public class Solution_24 {
         return newHeadNode;
     }
 
+    public ListNode swapPairs_Solution2(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        // 哨兵节点
+        ListNode dummyNode = new ListNode(-1);
+        // 哨兵指向头节点
+        dummyNode.next = head;
+        // 交换的一开始，head的头节点就是preNode
+        ListNode preNode = dummyNode;
+
+        // 交换存在的前提是 当前head不为空 且 他的后继节点不为空
+        while (head != null && head.next != null) {
+            ListNode firstNode = head;
+            ListNode secondNode = head.next;
+            // 开始交换
+            firstNode.next = secondNode.next;
+            secondNode.next = firstNode;
+            // 保证链表不断
+            preNode.next = secondNode;
+
+            // 前驱节点 指向交换后的后面一个节点
+            preNode = firstNode;
+            // 头节点指向原先second节点指向的后续节点
+            head = firstNode.next;
+        }
+
+        return dummyNode.next;
+    }
+
     // 递归解法
     public ListNode swapPairs_WithRecursion(ListNode head) {
         // 递归终止条件
