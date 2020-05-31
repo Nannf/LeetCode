@@ -64,7 +64,9 @@ public class Solution_206 {
         ListNode preNode = null;
         // 找到终止条件,反转需要两个节点
         while (head != null) {
+            // 如果head.next是null 表示这个head已经是最后一个节点了
             if (head.next == null) {
+                // 把head.next指向上一个节点
                 head.next = preNode;
                 break;
             }
@@ -73,13 +75,17 @@ public class Solution_206 {
             ListNode secondNode = head.next;
 
             // 记录下第二个节点的后继节点,当成下一个head
+            // 可能为空
             ListNode tmpNode = secondNode.next;
 
             // 还需要记录 firstNode 的前驱节点
+            // 指针的交换
             firstNode.next = preNode;
             secondNode.next = firstNode;
-            // 如果后继节点为空
+
+            // 如果后继节点为空,一般偶数个会出现这种情况
             if (tmpNode == null) {
+                // head 要变成第二个节点
                 head = secondNode;
                 break;
             }
