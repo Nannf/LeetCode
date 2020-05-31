@@ -1,2 +1,2 @@
 # LeetCode
-solution of leetcode
+人一能之，己百之；人十能之，己千之。
