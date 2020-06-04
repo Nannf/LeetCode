@@ -1,3 +1,7 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
+
 /**
  * @author Nannf
  * @date 2020/6/4 23:09
@@ -16,15 +20,22 @@
  */
 public class Solution_496 {
     public static void main(String[] args) {
-        int[] nums1 = new int[]{4, 1, 2};
-        int[] nums2 = new int[]{1, 3, 4, 2};
+        int[] nums1 = new int[]{2, 4};
+        int[] nums2 = new int[]{1, 2, 3, 4};
         int[] result = nextGreaterElement(nums1, nums2);
         for (int i = 0; i < result.length; i++) {
             System.out.println(result[i]);
         }
     }
 
-    public static int[] nextGreaterElement(int[] nums1, int[] nums2) {
+    /**
+     * o(n^3)我真是弱智
+     *
+     * @param nums1
+     * @param nums2
+     * @return
+     */
+    public static int[] nextGreaterElement_solution1(int[] nums1, int[] nums2) {
         int[] resultArray = new int[nums1.length];
         for (int i = 0; i < nums1.length; i++) {
             for (int j = 0; j < nums2.length; j++) {
@@ -45,6 +56,52 @@ public class Solution_496 {
 
             }
         }
+        return resultArray;
+    }
+
+    /**
+     * 栈的题目，nums1 是 nums2 的子集，栈是后进先出 这之间有什么关系呢？
+     * 自己想不到解法，看题解得知单调栈
+     *
+     * @param nums1
+     * @param nums2
+     * @return
+     */
+    public static int[] nextGreaterElement(int[] nums1, int[] nums2) {
+        int[] resultArray = new int[nums1.length];
+        Stack<Integer> stack = new Stack<>();
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < nums2.length; i++) {
+            if (stack.isEmpty()) {
+                stack.push(nums2[i]);
+            } else {
+                // 如果发现栈底的元素比自己小
+                if (stack.peek() < nums2[i]) {
+                    // 循环整个栈
+                    while (!stack.isEmpty()) {
+                        if (stack.peek() < nums2[i]) {
+                            map.put(stack.pop(), nums2[i]);
+                        } else {
+                            stack.push(nums2[i]);
+                            break;
+                        }
+                    }
+                    if (stack.isEmpty()) {
+                        stack.push(nums2[i]);
+                    }
+
+                } else {
+                    stack.push(nums2[i]);
+                }
+            }
+        }
+        while (!stack.isEmpty()) {
+            map.put(stack.pop(), -1);
+        }
+        for (int i = 0; i < nums1.length; i++) {
+            resultArray[i] = map.get(nums1[i]);
+        }
+
         return resultArray;
     }
 
