@@ -79,22 +79,28 @@ public class Solution_496 {
                 if (stack.peek() < nums2[i]) {
                     // 循环整个栈
                     while (!stack.isEmpty()) {
+                        // 如果栈最上面的元素比自己小，说明新假如的元素是栈底元素的下一个最大值
                         if (stack.peek() < nums2[i]) {
                             map.put(stack.pop(), nums2[i]);
                         } else {
+                            // 因为栈是单调递减的，所以比栈低的大，不代表比下面的值也大
                             stack.push(nums2[i]);
+                            // 因为单调递减，所以当发现一个之后 应该结束循环
                             break;
                         }
                     }
+                    // 如果此时栈已空，表示原来栈中所有的值都比新来的值小，这时候需要把新的元素入栈
                     if (stack.isEmpty()) {
                         stack.push(nums2[i]);
                     }
 
                 } else {
+                    // 栈低元素比自己大，直接入栈
                     stack.push(nums2[i]);
                 }
             }
         }
+        // 如果栈不空，表示有的元素找不到比自己更大的值
         while (!stack.isEmpty()) {
             map.put(stack.pop(), -1);
         }
