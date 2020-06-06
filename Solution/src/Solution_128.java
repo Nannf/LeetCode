@@ -22,7 +22,7 @@ public class Solution_128 {
     }
 
     // 先用暴力解法，再分析暴力解法无用的地方，对其进行优化
-    public int longestConsecutive(int[] nums) {
+    public int longestConsecutive2(int[] nums) {
         if (nums == null) {
             throw new IllegalArgumentException("不合法的参数");
         }
@@ -56,6 +56,41 @@ public class Solution_128 {
             if (length > maxResult) {
                 maxResult = length;
             }
+        }
+        return maxResult;
+    }
+
+
+    // 对暴力解法的优化
+    public int longestConsecutive(int[] nums) {
+        if (nums == null) {
+            throw new IllegalArgumentException("不合法的参数");
+        }
+        if (nums.length <= 1) {
+            return nums.length;
+        }
+        // 先放到set中去重，然后后面查找时时间复杂度是O(1)
+        Set<Integer> numSet = new HashSet<>();
+        for (int i : nums) {
+            numSet.add(i);
+        }
+        int maxResult = 0;
+        for (int i : numSet) {
+            int length = 1;
+            // 这边其实是多找了的
+            // 给定一个数组，假定其中有一个序列 就是  x,x+1,x+2...x+y 这样一个序列，
+            // 我们从 中间开始匹配 x+1 ..等开始匹配，是不会优于从x开始匹配的，相当于做了无用功
+            // 哪些数字我们不需要进行匹配呢？
+            // 假定数x，倘若x-1也在数组中，表示x并不是最优序列的起点，就没有必要让其进行内层的循环
+            if (numSet.contains(i - 1)) {
+                continue;
+            }
+            // 两层循环，均摊时间复杂度是O(1)
+            // 因为外层循环跳过一个数，这边的循环就会被补充上
+            while (numSet.contains(++i)) {
+                length++;
+            }
+            maxResult = Math.max(maxResult, length);
         }
         return maxResult;
     }
