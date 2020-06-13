@@ -21,7 +21,7 @@ public class Solution_15 {
 
     public static void main(String[] args) {
         List<List<Integer>> result = new ArrayList<>();
-        int[] nums = new int[]{-4, -2, -2, -2, 0, 1, 2, 2, 2, 3, 3, 4, 4, 6, 6};
+        int[] nums = new int[]{};
         result = threeSum(nums);
         for (List<Integer> list : result) {
             System.out.println(list);
@@ -34,6 +34,24 @@ public class Solution_15 {
         }
         // 先固定一个值，然后问题退化成两数之和的问题，要解决一个就是不能包含重复三元组的问题
         List<List<Integer>> result = new ArrayList<>();
+        // 如果有三个0 也应该是一个结果
+        int zeroCount = 0;
+        for (int i : nums) {
+            if (i == 0) {
+                zeroCount++;
+            }
+        }
+        if (zeroCount >= 3) {
+            List<Integer> list = new ArrayList<>();
+            list.add(0);
+            list.add(0);
+            list.add(0);
+            result.add(list);
+        }
+        if (result.size() != 0 && nums.length == 3) {
+            return result;
+        }
+
         for (int i = 0; i < nums.length; i++) {
             int target = 0 - nums[i];
             Map<Integer, Integer> map = new HashMap<>();
@@ -63,14 +81,17 @@ public class Solution_15 {
                 }
             }
         }
+
         return finalResult;
     }
 
     private static boolean contains(List<List<Integer>> finalResult, List<Integer> list) {
         for (List<Integer> list1 : finalResult) {
+            Set<Integer> set = new HashSet<>();
+            set.addAll(list1);
             int count = 0;
             for (int i : list) {
-                if (!list1.contains(i)) {
+                if (!set.contains(i)) {
                     break;
                 }
                 count++;
