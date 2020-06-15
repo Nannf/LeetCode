@@ -37,9 +37,8 @@ public class Solution_682 {
             switch (str) {
                 case "+":
                     int num1 = numberStack.pop();
-                    int num2 = numberStack.pop();
+                    int num2 = numberStack.peek();
                     int num3 = num1 + num2;
-                    numberStack.push(num2);
                     numberStack.push(num1);
                     numberStack.push(num3);
                     break;
@@ -47,9 +46,7 @@ public class Solution_682 {
                     numberStack.pop();
                     break;
                 case "D":
-                    int num4 = numberStack.pop();
-                    int num5 = num4 * 2;
-                    numberStack.push(num4);
+                    int num5 = numberStack.peek() * 2;
                     numberStack.push(num5);
                     break;
                 default:
