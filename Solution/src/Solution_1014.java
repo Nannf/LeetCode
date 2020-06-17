@@ -14,23 +14,32 @@
 public class Solution_1014 {
 
     public static void main(String[] args) {
-        int[] a = new int[]{8,1,5,2,6};
+        int[] a = new int[]{8, 1, 5, 2, 6};
         System.out.println(new Solution_1014().maxScoreSightseeingPair(a));
+    }
+
+    public int maxScoreSightseeingPair_Mine(int[] A) {
+        // 先不管，上来先用暴力解法
+        // 提交后 超出时间限制，需要找出其中多余计算的部分，进行优化
+        int result = 0;
+        for (int i = 0; i < A.length; i++) {
+            for (int j = i+1; j < A.length; j++) {
+                result = Math.max(result,A[i] + A[j] + i - j);
+            }
+        }
+
+        return result;
     }
 
     public int maxScoreSightseeingPair(int[] A) {
         // 先不管，上来先用暴力解法
         // 提交后 超出时间限制，需要找出其中多余计算的部分，进行优化
-        int max = 0;
-        for (int i = 0; i < A.length; i++) {
-            for (int j = i + 1; j < A.length; j++) {
-                int num = A[i] + A[j] + i - j;
-                if (num > max) {
-                    max = num;
-                }
-            }
+        int mx = A[0] + 0;
+        int ans = 0;
+        for (int i = 1; i < A.length; i++) {
+            ans = Math.max(ans,A[i] - i + mx);
+            mx = Math.max(mx, A[i] + i);
         }
-
-        return max;
+        return ans;
     }
 }
