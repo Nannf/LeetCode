@@ -26,32 +26,14 @@ public class Solution_2 {
     }
 
     public static void main(String[] args) {
-        ListNode l1 = new ListNode(1);
-        ListNode l21 = new ListNode(9);
-        ListNode l22 = new ListNode(9);
-        ListNode l23 = new ListNode(9);
-        ListNode l24 = new ListNode(9);
-        ListNode l25 = new ListNode(9);
-        ListNode l26 = new ListNode(9);
-        ListNode l27 = new ListNode(9);
-        ListNode l28 = new ListNode(9);
-        ListNode l29 = new ListNode(9);
-        ListNode l210 = new ListNode(1);
-        l21.next = l22;
-        l22.next = l23;
-        l23.next = l24;
-        l24.next = l25;
-        l25.next = l26;
-        l26.next = l27;
-        l27.next = l28;
-        l28.next = l29;
-        l29.next = l210;
-        ListNode result = addTwoNumbers(l1,l21);
+        ListNode l1 = new ListNode(5);
+        ListNode l2 = new ListNode(5);
+        ListNode result = addTwoNumbers(l1, l2);
         System.out.println(1);
 
     }
 
-    public static ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+    public static ListNode addTwoNumbers_NotPass(ListNode l1, ListNode l2) {
         if (l1 == null || l2 == null) {
             return l1 == null ? l2 : l1;
         }
@@ -77,11 +59,53 @@ public class Solution_2 {
         BigInteger bigDecimal2 = new BigInteger(numSb2.toString());
         BigInteger result = bigDecimal1.add(bigDecimal2);
         ListNode dummyNode = new ListNode(-1);
-        char[] chars = (result+"").toCharArray();
+        char[] chars = (result + "").toCharArray();
         for (char c : chars) {
             ListNode listNode = new ListNode(Integer.valueOf(String.valueOf(c)));
             listNode.next = dummyNode.next;
             dummyNode.next = listNode;
+        }
+        return dummyNode.next;
+    }
+
+    public static ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        if (l1 == null || l2 == null) {
+            return l1 == null ? l2 : l1;
+        }
+        // 哨兵节点
+        ListNode dummyNode = new ListNode(-1);
+        ListNode head = dummyNode;
+        int sympol = 0;
+        while (l1 != null && l2 != null) {
+            int value = (l1.val + l2.val + sympol) % 10;
+            sympol = (l1.val + l2.val + sympol) / 10;
+            ListNode listNode = new ListNode(value);
+            head.next = listNode;
+            head = listNode;
+            l1 = l1.next;
+            l2 = l2.next;
+        }
+
+        while (l1 != null) {
+            int value = (l1.val + sympol) % 10;
+            sympol = (l1.val + sympol) / 10;
+            ListNode listNode = new ListNode(value);
+            head.next = listNode;
+            head = listNode;
+            l1 = l1.next;
+        }
+        while (l2 != null) {
+            int value = (l2.val + sympol) % 10;
+            sympol = (l2.val + sympol) / 10;
+            ListNode listNode = new ListNode(value);
+            head.next = listNode;
+            head = listNode;
+            l2 = l2.next;
+        }
+        if ( sympol ==1) {
+            ListNode listNode = new ListNode(1);
+            head.next = listNode;
+            head = listNode;
         }
         return dummyNode.next;
     }
