@@ -6,7 +6,7 @@
 public class QuickSort {
 
     public static void main(String[] args) {
-        int[] a= new int[] { 7,6,5,4,1,3};
+        int[] a= new int[] { 2,3,4,5,8,5};
         sort(a,6);
         for(int i : a) {
             System.out.println(i);
@@ -32,7 +32,7 @@ public class QuickSort {
         int x = a[r];
         for (int j = p; j < r; j++) {
             // 如果当前遍历的值不小于分区值，不做移动
-            if (a[j] >= x) {
+            if (a[j] > x) {
                 continue;
             }
             int tmp = a[i];
