@@ -62,7 +62,7 @@ public class Solution_703 {
         int i = p;
         int x = nums[r];
         for (int j = p; j < r; j++) {
-            if (nums[j] <= x) {
+            if (nums[j] > x) {
                 int tmp = nums[i];
                 nums[i] = nums[j];
                 nums[j] = tmp;
