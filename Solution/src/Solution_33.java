@@ -20,19 +20,13 @@
 public class Solution_33 {
 
     public static void main(String[] args) {
-        int[] nums = new int[] {1,3};
-        System.out.println(new Solution_33().search(nums,3));
+        int[] nums = new int[]{1, 3};
+        System.out.println(new Solution_33().search(nums, 3));
     }
 
     public int search(int[] nums, int target) {
         if (nums.length == 0) {
             return -1;
-        }
-        if (nums.length == 1 ){
-           if ( nums[0] == target) {
-               return 0;
-           }
-           return -1;
         }
         // 先找出数组中的分界点的下标索引，使用二分查找查询出数组中第一个小于数组第一个数值的下标索引
         int partIndex = findPartIndex(nums);
@@ -40,22 +34,25 @@ public class Solution_33 {
         if (partIndex == -1) {
             partIndex = nums.length;
         }
-        if (target >= nums[0]) {
-            return binarySearch(nums, 0, partIndex - 1,target);
+        if (target == nums[0]) {
+            return 0;
+        }
+        if (target > nums[0]) {
+            return binarySearch(nums, 0, partIndex - 1, target);
         } else {
-            return binarySearch(nums, partIndex, nums.length - 1,target);
+            return binarySearch(nums, partIndex, nums.length - 1, target);
         }
     }
 
     private int binarySearch(int[] nums, int l, int h, int target) {
         while (l <= h) {
-            int mid = l + ((h - l) >>1);
+            int mid = l + ((h - l) >> 1);
             if (nums[mid] == target) {
                 return mid;
             } else if (nums[mid] > target) {
-                h = mid -1;
+                h = mid - 1;
             } else {
-                l = mid+1;
+                l = mid + 1;
             }
         }
         return -1;
