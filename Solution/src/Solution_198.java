@@ -18,13 +18,19 @@ public class Solution_198 {
     // 难点在于 穷举出所有的可能性，并不是稳定的隔一个取一个，可以隔两个，只要不相邻
     // 你管这这叫简单？？？？？
     public int rob(int[] nums) {
-        int maxNum = 0;
-        for (int i = 0 ; i < nums.length; i++) {
-            int tmpSum = 0;
-            for (int j  = i+2; j<nums.length ;) {
-                tmpSum += nums[i]+nums[j];
-            }
+        if (nums == null || nums.length == 0) {
+            return 0;
         }
-        return 0;
+        if (nums.length == 1) {
+            return nums[0];
+        }
+
+        int[] dp = new int[nums.length];
+        dp[0] = nums[0];
+        dp[1] = Math.max(nums[0],nums[1]);
+        for (int i = 2; i < nums.length;i++) {
+            dp[i] = Math.max(dp[i-2] + nums[i],dp[i-1]);
+        }
+        return dp[nums.length-1];
     }
 }
