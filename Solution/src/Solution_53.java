@@ -11,13 +11,24 @@
  */
 public class Solution_53 {
     public static void main(String[] args) {
-        int[] nums = new int[]{1,2};
+        int[] nums = new int[]{1, 2};
         System.out.println(maxSubArray(nums));
+    }
+
+
+    public static int maxSubArray(int[] nums) {
+        int length = nums.length;
+        int pre = 0, max = nums[0];
+        for (int i = 0; i < length; i++) {
+            pre = Math.max(pre+nums[i],nums[i]);
+            max = Math.max(pre,max);
+        }
+        return max;
     }
 
     // 假设我们要计算子数组k的最大和
     // 如果我k-1的最大和大于0，那就是k-1的最大和，否则就是自己本身
-    public static int maxSubArray(int[] nums) {
+    public static int maxSubArray_pass(int[] nums) {
         if (nums == null || nums.length == 0) {
             throw new IllegalArgumentException("");
         }
@@ -32,7 +43,7 @@ public class Solution_53 {
             dp[i] = Math.max(dp[i - 1] + nums[i], nums[i]);
         }
         int max = Integer.MIN_VALUE;
-        for (int i = 0; i< dp.length; i++) {
+        for (int i = 0; i < dp.length; i++) {
             if (dp[i] > max) {
                 max = dp[i];
             }
