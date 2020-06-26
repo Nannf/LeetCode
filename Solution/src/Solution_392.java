@@ -18,6 +18,8 @@
  * s = "axc", t = "ahbgdc"
  * <p>
  * 返回 false.
+ * "aaaaaa"
+ * "bbaaaa"
  */
 public class Solution_392 {
     public static void main(String[] args) {
@@ -28,10 +30,28 @@ public class Solution_392 {
         }
     }
 
+    public static boolean isSubsequence(String s, String t) {
+        if (s.length() == 0) {
+            return true;
+        }
+        if(t.length() == 0) {
+            return false;
+        }
+        int index = -1;
+        for (int i = 0; i < s.length(); i++) {
+            int ans = t.indexOf(s.charAt(i),index+1);
+            if (ans == -1 || ans == index) {
+                return false;
+            }
+            index = ans;
+        }
+        return true;
+    }
+
     // 动态规划做
     // 本题的思路就是逐个循环s每个位置的字符，判断其在t的位置，如果后出现的字符的下标索引<=它前一个的下标索引，表示不存在
 
-    public static boolean isSubsequence(String s, String t) {
+    public static boolean isSubsequence_Pass(String s, String t) {
         if(t.length() == 0) {
             if(s.length() == 0) {
                 return true;
