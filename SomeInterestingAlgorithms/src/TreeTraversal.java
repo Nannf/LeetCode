@@ -1,3 +1,5 @@
+import java.util.Stack;
+
 /**
  * @auth Nannf
  * @date 2020/6/27 10:33
@@ -20,7 +22,7 @@ public class TreeTraversal {
         t2.left = t6;
         t2.right = t7;
         t4.left = t8;
-        preOrderTraversal(tree);
+        inOrderTraversal(tree);
     }
 
     /**
@@ -28,27 +30,70 @@ public class TreeTraversal {
      *
      * @param tree
      */
-    public static void preOrderTraversal(TreeNode tree) {
-        if (tree == null){
+    public static void preOrderTraversal_recursion(TreeNode tree) {
+        if (tree == null) {
             return;
         }
         System.out.println(tree.val);
-        preOrderTraversal(tree.left);
-        preOrderTraversal(tree.right);
+        preOrderTraversal_recursion(tree.left);
+        preOrderTraversal_recursion(tree.right);
     }
+
+    public static void preOrderTraversal(TreeNode tree) {
+        if (tree == null) {
+            return;
+        }
+        Stack<TreeNode> stack = new Stack<>();
+        stack.push(tree);
+        while (!stack.isEmpty()) {
+            TreeNode root = stack.pop();
+            System.out.println(root.val);
+            if (root.right != null) {
+                stack.push(root.right);
+            }
+            if (root.left != null) {
+                stack.push(root.left);
+            }
+        }
+    }
+
 
     /**
      * 中序遍历
      *
      * @param tree
      */
-    public static void inOrderTraversal(TreeNode tree) {
-        if (tree == null){
+    public static void inOrderTraversal_recursion(TreeNode tree) {
+        if (tree == null) {
             return;
         }
-        inOrderTraversal(tree.left);
+        inOrderTraversal_recursion(tree.left);
         System.out.println(tree.val);
-        inOrderTraversal(tree.right);
+        inOrderTraversal_recursion(tree.right);
+    }
+
+    public static void inOrderTraversal(TreeNode tree) {
+        if (tree == null) {
+            return;
+        }
+        Stack<TreeNode> stack = new Stack<>();
+        stack.push(tree);
+        // 链表的操作指针
+        TreeNode tmp = tree;
+        while (!stack.isEmpty()) {
+            // 把当前节点和所有的左孩子节点全部入栈
+            while (tmp != null) {
+                stack.push(tmp);
+                tmp = tmp.left;
+            }
+            TreeNode t1 = stack.pop();
+            System.out.println(t1.val);
+            if (t1.right != null) {
+                tmp = t1.right;
+            } else {
+                tmp = null;
+            }
+        }
     }
 
     /**
@@ -57,7 +102,7 @@ public class TreeTraversal {
      * @param tree
      */
     public static void postOrderTraversal(TreeNode tree) {
-        if (tree == null){
+        if (tree == null) {
             return;
         }
         postOrderTraversal(tree.left);
