@@ -1,4 +1,6 @@
 import java.sql.SQLOutput;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 /**
@@ -78,10 +80,9 @@ public class TreeTraversal {
             return;
         }
         Stack<TreeNode> stack = new Stack<>();
-        stack.push(tree);
         // 链表的操作指针
         TreeNode tmp = tree;
-        while (!stack.isEmpty()) {
+        while (!stack.isEmpty() || tmp != null) {
             // 把当前节点和所有的左孩子节点全部入栈
             while (tmp != null) {
                 stack.push(tmp);
@@ -117,22 +118,24 @@ public class TreeTraversal {
         }
         Stack<TreeNode> stack = new Stack<>();
         TreeNode head = tree;
-        TreeNode prev = tree;
-        stack.push(tree);
-        while (!stack.isEmpty()) {
+        TreeNode prev = null;
+        while (!stack.isEmpty() || head != null) {
+            // 左孩子全部入栈
             while (head != null) {
                 stack.push(head);
                 head = head.left;
             }
-            TreeNode rightChild = stack.peek().right;
-
-            if (rightChild == null || prev == stack.peek()) {
-                System.out.println(stack.pop());
-                head = null;
+            // 获取栈顶元素
+            TreeNode tmp = stack.peek();
+            // 只有当栈顶元素没有右孩子或者右孩子已经访问过
+            if (tmp.right== null || tmp.right == prev) {
+                // 栈顶元素出栈
+                tmp = stack.pop();
+                System.out.println(tmp.val);
+                //
+                prev = tmp;
             } else {
-                prev = stack.peek();
-                stack.push(rightChild);
-                head = rightChild;
+              head = tmp.right;
             }
         }
     }
