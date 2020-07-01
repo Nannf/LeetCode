@@ -1,3 +1,4 @@
+import java.sql.SQLOutput;
 import java.util.Stack;
 
 /**
@@ -22,7 +23,7 @@ public class TreeTraversal {
         t2.left = t6;
         t2.right = t7;
         t4.left = t8;
-        inOrderTraversal(tree);
+        postOrderTraversal(tree);
     }
 
     /**
@@ -101,12 +102,38 @@ public class TreeTraversal {
      *
      * @param tree
      */
+    public static void postOrderTraversal_recursion(TreeNode tree) {
+        if (tree == null) {
+            return;
+        }
+        postOrderTraversal_recursion(tree.left);
+        postOrderTraversal_recursion(tree.right);
+        System.out.println(tree.val);
+    }
+
     public static void postOrderTraversal(TreeNode tree) {
         if (tree == null) {
             return;
         }
-        postOrderTraversal(tree.left);
-        postOrderTraversal(tree.right);
-        System.out.println(tree.val);
+        Stack<TreeNode> stack = new Stack<>();
+        TreeNode head = tree;
+        TreeNode prev = tree;
+        stack.push(tree);
+        while (!stack.isEmpty()) {
+            while (head != null) {
+                stack.push(head);
+                head = head.left;
+            }
+            TreeNode rightChild = stack.peek().right;
+
+            if (rightChild == null || prev == stack.peek()) {
+                System.out.println(stack.pop());
+                head = null;
+            } else {
+                prev = stack.peek();
+                stack.push(rightChild);
+                head = rightChild;
+            }
+        }
     }
 }
