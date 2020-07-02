@@ -32,7 +32,8 @@ public class Solution_102 {
     }
 
 
-    public List<List<Integer>> levelOrder(TreeNode root) {
+
+    public List<List<Integer>> levelOrder_Solution2(TreeNode root) {
         if (root == null) {
             return new ArrayList<>();
         }

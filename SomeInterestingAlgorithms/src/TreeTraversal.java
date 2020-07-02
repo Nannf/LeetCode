@@ -1,7 +1,5 @@
 import java.sql.SQLOutput;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * @auth Nannf
@@ -136,6 +134,33 @@ public class TreeTraversal {
                 prev = tmp;
             } else {
               head = tmp.right;
+            }
+        }
+    }
+
+    public static void levelOrder(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+        Queue<TreeNode> queue = new ArrayDeque<>();
+        queue.offer(root);
+        while(!queue.isEmpty()){
+            List<TreeNode> list = new ArrayList<>();
+            while(!queue.isEmpty()) {
+                TreeNode tmp = queue.poll();
+                list.add(tmp);
+            }
+            for (TreeNode t : list) {
+                System.out.print(t.getVal() + " ");
+            }
+            System.out.println();
+            for (TreeNode t :list) {
+                if (t.left != null) {
+                    queue.offer(t.left);
+                }
+                if (t.right != null) {
+                    queue.offer(t.right);
+                }
             }
         }
     }
