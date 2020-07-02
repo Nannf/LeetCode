@@ -1,7 +1,6 @@
 import sun.reflect.generics.tree.Tree;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @auth Nannf
@@ -31,7 +30,38 @@ public class Solution_102 {
             val = x;
         }
     }
+
+
     public List<List<Integer>> levelOrder(TreeNode root) {
+        if (root == null) {
+            return new ArrayList<>();
+        }
+        List<List<Integer>> result = new ArrayList<>();
+        Queue<TreeNode> queue = new ArrayDeque<>();
+        queue.offer(root);
+        while(!queue.isEmpty()){
+            List<TreeNode> list = new ArrayList<>();
+            List<Integer> list1 = new ArrayList<>();
+            while(!queue.isEmpty()) {
+                TreeNode tmp = queue.poll();
+                list.add(tmp);
+                list1.add(tmp.val);
+            }
+            result.add(list1);
+            for (TreeNode t :list) {
+                if (t.left != null) {
+                    queue.offer(t.left);
+                }
+                if (t.right != null) {
+                    queue.offer(t.right);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public List<List<Integer>> levelOrder_Solution1(TreeNode root) {
         if (root == null) {
             return new ArrayList<>();
         }
