@@ -21,11 +21,11 @@ public class Solution_703 {
     int result;
 
     public static void main(String[] args) {
-        int[] array = new int[] {4,5,8,2};
-        Solution_703 s = new Solution_703(3,array);
+        int[] array = new int[]{4, 5, 8, 2};
+        Solution_703 s = new Solution_703(3, array);
         System.out.println(s.add(3));
         System.out.println(s.add(5));
-        System.out.println(s.add(10 ));
+        System.out.println(s.add(10));
         System.out.println(s.add(9));
         System.out.println(s.add(4));
     }
@@ -35,26 +35,33 @@ public class Solution_703 {
         this.nums = nums;
     }
 
+
     public int add(int val) {
+
+        return -1;
+    }
+
+
+    public int add_solution1(int val) {
         int[] newArray = new int[nums.length + 1];
         System.arraycopy(nums, 0, newArray, 0, nums.length);
         newArray[nums.length] = val;
         nums = newArray;
-        findK(nums, 0, nums.length - 1);
-        System.out.println("size + :::: "+nums.length);
+        findK_solution1(nums, 0, nums.length - 1);
+        System.out.println("size + :::: " + nums.length);
         return result;
     }
 
-    private void findK(int[] nums, int p, int r) {
+    private void findK_solution1(int[] nums, int p, int r) {
         int q = part(nums, p, r);
         if (q + 1 == k) {
             result = nums[q];
             return;
         }
         if (q + 1 < k) {
-            findK(nums, q + 1, r);
+            findK_solution1(nums, q + 1, r);
         } else {
-            findK(nums, p, q - 1);
+            findK_solution1(nums, p, q - 1);
         }
     }
 
