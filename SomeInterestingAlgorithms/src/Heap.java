@@ -75,6 +75,11 @@ public class Heap {
 
     }
 
+    /**
+     * 0,7,5,19,8,4,1,20,13,16
+     * 0,20,16,19,13,4,1,7,5,8
+     * @param a
+     */
     public void buildHead(int[] a) {
 
     }
