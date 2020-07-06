@@ -33,8 +33,8 @@ public class Heap {
 //        }
         int[] a = new int[]{0, 7, 5, 19, 8, 4, 1, 20, 13, 16};
         Heap heap = new Heap(a, 100);
-        heap.buildHeap2();
-
+//        heap.buildHeap2();
+        heap.sort();
     }
 
     public void insert(int data) {
@@ -55,7 +55,7 @@ public class Heap {
     }
 
     public void remove() {
-        if (elementCount == 0) {
+        if (a.length == 0) {
             return;
         }
         // 拿最后一个节点的值替换根节点的值
@@ -94,9 +94,9 @@ public class Heap {
         for (int i = 1; i < a.length; i++) {
             insert(a[i]);
         }
-        for (int i : a) {
-            System.out.println(i);
-        }
+//        for (int i : a) {
+//            System.out.println(i);
+//        }
     }
 
     /**
@@ -115,6 +115,25 @@ public class Heap {
     }
 
     private void swapNode(int i) {
+        while (true) {
+            int maxpos = i;
+            if (i * 2 < a.length && a[maxpos] < a[i * 2]) {
+                maxpos = i * 2;
+            }
+            if (i * 2 + 1 < a.length && a[maxpos] < a[i * 2 + 1]) {
+                maxpos = i * 2 + 1;
+            }
+            if (maxpos == i) {
+                break;
+            }
+            int tmp = a[maxpos];
+            a[maxpos] = a[i];
+            a[i] = tmp;
+            i = maxpos;
+        }
+    }
+
+    private void swapNode2(int i) {
         // 当当前节点至少有一个孩子节点的时候
         while (i * 2 <= a.length || i * 2 + 1 <= a.length) {
             int childMax = 0;
@@ -140,6 +159,20 @@ public class Heap {
 
         }
 
+    }
+
+    public void sort() {
+        buildHeap();
+        int k = a.length -1;
+        int[] result = new int[a.length];
+        while (k > 0) {
+            int tmp = a[1];
+            remove();
+            result[k--] = tmp;
+        }
+        for (int i : result) {
+            System.out.println(i);
+        }
     }
 
 }
