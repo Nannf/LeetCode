@@ -3,100 +3,105 @@
  * @auth Nannf
  * @date 2020/7/3 14:22
  * @description: 堆
+ * 代码中给出的示例是大顶堆，小顶堆类似
  */
 public class Heap {
+
+    private static final int DEFAULT_CAPACITY = 100;
+    /**
+     * 存放数据的数组
+     */
     private int[] a;
-    private int n;
-    private int elementCount;
+    /**
+     * 堆的最大容量
+     */
+    private int capacity;
 
-    public Heap(int capacity) {
-        a = new int[capacity + 1];
-        n = capacity;
+    /**
+     * 堆中存放数据的个数
+     */
+    private int size;
+
+    private Heap(int capacity) {
+        this.a = new int[capacity + 1];
+        this.size = 0;
+        this.capacity = capacity + 1;
     }
 
-    public Heap(int[] a, int capacity) {
-        this.a = a;
-        n = capacity;
-
-    }
 
     public static void main(String[] args) {
-//        Heap heap = new Heap(10);
-//        heap.insert(10);
-//        heap.insert(9);
-//        heap.insert(8);
-//        heap.insert(7);
-//        heap.insert(11);
-//        heap.remove();
-//        for (int i : heap.a) {
-//            System.out.println(i);
-//        }
-        int[] a = new int[]{0, 7, 5, 19, 8, 4, 1, 20, 13, 16};
-        Heap heap = new Heap(a, 100);
+        int[] a = new int[]{7, 5, 19, 8, 4, 1, 20, 13, 16};
+//        testInsert();
+//        testRemove();
+        Heap heap = new Heap(10);
 //        heap.buildHeap2();
-        heap.sort();
+        heap.sort(a);
+        printHeap(heap.a);
+
     }
+
 
     public void insert(int data) {
-        if (n == elementCount) {
+        // 暂时没考虑扩容
+        if (size == capacity) {
+            System.out.println("堆已满，无法添加新元素！");
             return;
         }
-        elementCount++;
-        a[elementCount] = data;
-        int head = elementCount;
-        int parent = elementCount / 2;
-        while (a[head] > a[parent] && parent > 0) {
-            int tmp = a[head];
-            a[head] = a[parent];
-            a[parent] = tmp;
-            head = parent;
-            parent = parent / 2;
+        // 先把数据插到数组的最后
+        a[++size] = data;
+        //大顶堆 插入进来之后 可能需要上浮，上浮的终止条件的浮到根节点
+        int head = size;
+        while (a[head] > a[head / 2] && (head / 2) > 0) {
+            // 交换节点
+            swap(a, head, head / 2);
+            head = head / 2;
         }
     }
 
+
+
     public void remove() {
-        if (a.length == 0) {
+        if (size == 0) {
+            System.out.println("堆已为空，无法删除");
             return;
         }
         // 拿最后一个节点的值替换根节点的值
-        a[1] = a[elementCount];
-        a[elementCount] = 0;
-        elementCount--;
-        int i = 1;
-        int left = 2;
-        int right = 3;
-        // 当子节点下标没有过界，并且当前的节点小于子节点的值
-        while (right <= elementCount && (a[i] < a[left] || a[i] < a[right])) {
-            if (a[left] > a[right]) {
-                int tmp = a[left];
-                a[left] = a[i];
-                a[i] = tmp;
-                i = left;
-                left = i * 2;
-                right = i * 2 + 1;
-            } else {
-                int tmp = a[right];
-                a[right] = a[i];
-                a[i] = tmp;
-                i = right;
-                left = i * 2;
-                right = i * 2 + 1;
-            }
-        }
+        // 这一步的目的是为了保证树在删除后仍然是完全二叉树
+        a[1] = a[size];
+        a[size--] = 0;
+        // 然后首节点要下沉
+        heapify(a, size, 1);
+    }
 
+    private void heapify(int[] a, int size, int i) {
+        int maxpos = i;
+        while (true) {
+            // 先比较左节点
+            if (i * 2 < size && a[i * 2] > a[i]) {
+                maxpos = i * 2;
+            }
+            // 再比较右节点
+            if (i * 2 + 1 < size && a[i * 2 + 1] > a[maxpos]) {
+                maxpos = i * 2 + 1;
+            }
+            // 如果三个节点最大的是自己，说明下沉到了最低点
+            if (maxpos == i) {
+                break;
+            }
+            //否则，交换，接着下沉
+            swap(a, i, maxpos);
+            i = maxpos;
+        }
     }
 
     /**
      * 0,7,5,19,8,4,1,20,13,16
      * 0,20,16,19,13,4,1,7,5,8
      */
-    public void buildHeap() {
-        for (int i = 1; i < a.length; i++) {
+    public void buildHeap(int[] a, int n) {
+        for (int i = 1; i < n; i++) {
             insert(a[i]);
         }
-//        for (int i : a) {
-//            System.out.println(i);
-//        }
     }
 
     /**
@@ -105,74 +110,68 @@ public class Heap {
      */
     public void buildHeap2() {
         // 最后一个非叶子节点出现的索引
-        int lastPlace = (a.length - 1) / 2;
+        int lastPlace = (size - 1) / 2;
         for (int i = lastPlace; i > 0; i--) {
-            swapNode(i);
-        }
-        for (int i : a) {
-            System.out.println(i);
+            heapify(a, size, i);
         }
     }
 
-    private void swapNode(int i) {
-        while (true) {
-            int maxpos = i;
-            if (i * 2 < a.length && a[maxpos] < a[i * 2]) {
-                maxpos = i * 2;
-            }
-            if (i * 2 + 1 < a.length && a[maxpos] < a[i * 2 + 1]) {
-                maxpos = i * 2 + 1;
-            }
-            if (maxpos == i) {
-                break;
-            }
-            int tmp = a[maxpos];
-            a[maxpos] = a[i];
-            a[i] = tmp;
-            i = maxpos;
-        }
-    }
 
-    private void swapNode2(int i) {
-        // 当当前节点至少有一个孩子节点的时候
-        while (i * 2 <= a.length || i * 2 + 1 <= a.length) {
-            int childMax = 0;
-            // 如果右孩子大于规定的大小
-            if (i * 2 + 1 > n) {
-                childMax = a[i * 2];
-            } else {
-                childMax = Math.max(a[i * 2], a[i * 2 + 1]);
-            }
-            if (a[i] < childMax) {
-                if (a[i * 2] == childMax) {
-                    int tmp = a[i * 2];
-                    a[i * 2] = a[i];
-                    a[i] = tmp;
-                    i = i * 2;
-                } else {
-                    int tmp = a[i * 2 + 1];
-                    a[i * 2 + 1] = a[i];
-                    a[i] = tmp;
-                    i = i * 2 + 1;
-                }
-            }
-
-        }
-
-    }
-
-    public void sort() {
-        buildHeap();
-        int k = a.length -1;
-        int[] result = new int[a.length];
-        while (k > 0) {
-            int tmp = a[1];
+    public void sort(int[] a) {
+        // 先从数组中建堆
+        buildHeap2();
+        int[] result = new int[size];
+        while (size > 0) {
+            result[size - 1] = a[size - 1];
             remove();
-            result[k--] = tmp;
         }
         for (int i : result) {
             System.out.println(i);
         }
+    }
+
+
+    public static void swap(int[] a, int x, int y) {
+        int tmp = a[x];
+        a[x] = a[y];
+        a[y] = tmp;
+    }
+
+    public static void printHeap(int[] a) {
+        for (int i = 1; i < a.length; i++) {
+            System.out.println(a[i]);
+        }
+    }
+
+
+
+    private static void testRemove() {
+        Heap heap = new Heap(9);
+        heap.insert(7);
+        heap.insert(5);
+        heap.insert(19);
+        heap.insert(8);
+        heap.insert(4);
+        heap.insert(1);
+        heap.insert(20);
+        heap.insert(13);
+        heap.insert(16);
+        heap.remove();
+        printHeap(heap.a);
+    }
+
+    private static void testInsert() {
+        Heap heap = new Heap(9);
+        heap.insert(7);
+        heap.insert(5);
+        heap.insert(19);
+        heap.insert(8);
+        heap.insert(4);
+        heap.insert(1);
+        heap.insert(20);
+        heap.insert(13);
+        heap.insert(16);
+        printHeap(heap.a);
     }
 
 }
