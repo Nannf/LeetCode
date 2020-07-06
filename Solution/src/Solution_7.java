@@ -14,11 +14,28 @@
  */
 public class Solution_7 {
     public static void main(String[] args) {
-        System.out.println(new Solution_7().reverse(-2147483648));
+        System.out.println(new Solution_7().reverse(-1563847412));
     }
 
-
+    // -2147483648 <= x <= 2147483647
     public int reverse(int x) {
+        int ans = 0;
+        while (x != 0) {
+            int pop = x % 10;
+            x = x / 10;
+            if (ans > Integer.MAX_VALUE / 10 || (ans == Integer.MAX_VALUE / 10 && pop > 7)) {
+                return 0;
+            }
+            if (ans < Integer.MIN_VALUE / 10 || (ans == Integer.MIN_VALUE / 10 && pop < -8)) {
+                return 0;
+            }
+            ans = ans * 10 + pop;
+        }
+        return ans;
+
+    }
+
+    public int reverse2(int x) {
         if (x >= Integer.MAX_VALUE || x <= Integer.MIN_VALUE) {
             return 0;
         }
@@ -39,6 +56,5 @@ public class Solution_7 {
             return Integer.parseInt(sb.toString()) * -1;
         }
         return Integer.parseInt(sb.toString());
-
     }
 }
