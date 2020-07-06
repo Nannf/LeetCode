@@ -28,14 +28,20 @@ public class Heap {
         this.capacity = capacity + 1;
     }
 
+    private Heap(int[] a) {
+        this.a = a;
+        this.size = a.length - 1;
+        this.capacity = DEFAULT_CAPACITY;
+    }
+
 
     public static void main(String[] args) {
-        int[] a = new int[]{7, 5, 19, 8, 4, 1, 20, 13, 16};
+        int[] a = new int[]{0, 7, 5, 19, 8, 4, 1, 20, 13, 16};
 //        testInsert();
 //        testRemove();
-        Heap heap = new Heap(10);
+        Heap heap = new Heap(a);
 //        heap.buildHeap2();
-        heap.sort(a);
+        heap.sort();
         printHeap(heap.a);
 
     }
@@ -59,7 +65,6 @@ public class Heap {
     }
 
 
-
     public void remove() {
         if (size == 0) {
             System.out.println("堆已为空，无法删除");
@@ -77,11 +82,11 @@ public class Heap {
         int maxpos = i;
         while (true) {
             // 先比较左节点
-            if (i * 2 < size && a[i * 2] > a[i]) {
+            if (i * 2 <= size && a[i * 2] > a[i]) {
                 maxpos = i * 2;
             }
             // 再比较右节点
-            if (i * 2 + 1 < size && a[i * 2 + 1] > a[maxpos]) {
+            if (i * 2 + 1 <= size && a[i * 2 + 1] > a[maxpos]) {
                 maxpos = i * 2 + 1;
             }
             // 如果三个节点最大的是自己，说明下沉到了最低点
@@ -110,24 +115,33 @@ public class Heap {
      */
     public void buildHeap2() {
         // 最后一个非叶子节点出现的索引
-        int lastPlace = (size - 1) / 2;
+        int lastPlace = size / 2;
         for (int i = lastPlace; i > 0; i--) {
-            heapify(a, size, i);
+            heapify(a, size + 1, i);
         }
     }
 
 
-    public void sort(int[] a) {
+    public void sort() {
+        // 先从数组中建堆
+        buildHeap2();
+        int k = size;
+        while (k > 1) {
+            swap(a, k, 1);
+            k--;
+            heapify(a, k, 1);
+        }
+    }
+
+    public void sort2() {
         // 先从数组中建堆
         buildHeap2();
         int[] result = new int[size];
         while (size > 0) {
-            result[size - 1] = a[size - 1];
+            result[size -1] = a[1];
             remove();
         }
-        for (int i : result) {
-            System.out.println(i);
-        }
+
     }
 
 
@@ -142,7 +156,6 @@ public class Heap {
             System.out.println(a[i]);
         }
     }
-
 
 
     private static void testRemove() {
