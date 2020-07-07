@@ -16,29 +16,40 @@
  * kthLargest.add(4);   // returns 8
  */
 public class Solution_703 {
+    // 构造包含k个数值的小顶堆
     int k;
+    // 存放数据的数组
     int[] data;
+    // 数组中实际包含元素的个数
     int size;
 
     public Solution_703(int k, int[] nums) {
         this.k = k;
         // 只维护k个数据的小顶堆
+        // k+1 是因为为了计算左右孩子节点方便，元素是从下标1开始存储
         this.data = new int[k + 1];
         init(nums);
     }
 
     private void init(int[] nums) {
+        // 如果初始化的数组小于k
         if (nums.length < k) {
+            // 一直插入就行
             for (int i = 0; i < nums.length; i++) {
                 insert(nums[i]);
             }
         } else {
+            // 先插入k个
             for (int i = 0; i < k; i++) {
                 insert(nums[i]);
             }
+            // 对剩下的数据
             for (int i = k; i < nums.length; i++) {
+                // 如果当前数据比堆顶的大
                 if (nums[i] > data[1]) {
+                    // 把堆顶的数据移除
                     remove();
+                    // 把当前的数据插入
                     insert(nums[i]);
                 }
             }
@@ -73,6 +84,7 @@ public class Solution_703 {
     }
 
     private void heapify(int[] a, int size, int i) {
+        // 记录当前节点 和 其左右孩子节点中 值最小的那个下标
         int minpos = i;
         while (true) {
             // 先比较左节点
@@ -101,14 +113,21 @@ public class Solution_703 {
 
 
     public int add(int val) {
+        // 如果当前数组中的元素数量未达到k
         if (size < k) {
+            // 插入
             insert(val);
+            // 返回堆顶元素
             return data[1];
         }
+        // 如果当前插入的数据小于等于堆顶的元素
         if (val <= data[1]) {
+            // 直接返回
             return data[1];
         }
+        // 把堆顶元素删除
         remove();
+        // 把当前元素插入
         insert(val);
         return data[1];
     }
