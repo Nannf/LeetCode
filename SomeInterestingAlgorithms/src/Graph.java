@@ -13,6 +13,8 @@ public class Graph {
     // 邻接表
     private LinkedList<Integer>[] adj;
 
+    private boolean found = false;
+
     public Graph(int v) {
         this.v = v;
         adj = new LinkedList[v];
@@ -29,17 +31,17 @@ public class Graph {
 
     public static void main(String[] args) {
         Graph graph = new Graph(8);
-        graph.addEdge(0,1);
-        graph.addEdge(0,3);
-        graph.addEdge(1,2);
-        graph.addEdge(1,4);
-        graph.addEdge(3,4);
-        graph.addEdge(2,5);
-        graph.addEdge(4,5);
-        graph.addEdge(4,6);
-        graph.addEdge(5,7);
-        graph.addEdge(6,7);
-        graph.bfs(0,7);
+        graph.addEdge(0, 1);
+        graph.addEdge(0, 3);
+        graph.addEdge(1, 2);
+        graph.addEdge(1, 4);
+        graph.addEdge(3, 4);
+        graph.addEdge(2, 5);
+        graph.addEdge(4, 5);
+        graph.addEdge(4, 6);
+        graph.addEdge(5, 7);
+        graph.addEdge(6, 7);
+        graph.dfs(0, 7);
     }
 
     /**
@@ -87,6 +89,33 @@ public class Graph {
 
             for (int i : tmpList) {
                 queue.offer(i);
+            }
+        }
+    }
+
+    public void dfs(int s, int t) {
+        if (s == t) {
+            return;
+        }
+        Set<Integer> visited = new HashSet<>();
+        List<Integer> path = new ArrayList<>();
+        recuDfs(s,t,visited,path);
+    }
+
+    private void recuDfs(int s, int t, Set<Integer> visited, List<Integer> path) {
+        if (found == true) {
+            return;
+        }
+        visited.add(s);
+        path.add(s);
+        if (s == t) {
+            found = true;
+            print(path);
+            return;
+        }
+        for (int i = 0; i < adj[s].size();i++) {
+            if (!visited.contains(adj[s].get(i))) {
+                recuDfs(adj[s].get(i),t,visited,path);
             }
         }
     }
