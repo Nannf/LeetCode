@@ -15,18 +15,13 @@
  */
 public class Solution_174 {
 
-    // 要找的就是 一个变正之前最小的负数，且以后全是正数的这样一个路线
-    // 这个最小的负数取反就是结果
-    // 我们要如何定义数组来满足这个要求的解呢？
-    // 我的思路是不是有问题？
-    // 原来dp是需要要求无后效性的
-    // 查看题解后发现可以反向dp
-    // 我们定义dp[i][j] 为当移动到i，j这个位置时，初始值至少需要多少才能活着
-    // 或者的最小值是1 也就是 dp[i+1][j] + dp[i][j] >=1 dp[i][j+1] + dp[i][j] >= 1;
-    // dp[i][j] >= 1- dp[i+1][j]; dp[i][j] >= 1-dp[i][j+1]
-    // 要求dp[i][j] 的最小值 <=> 求 1 -dp[i+1][j] 和 1-dp[i][j+1]的最小值  <=> 求 dp[i+1][j] 和 dp[i][j+1]的最大值
-    // 当然这里有个前提条件 就是
-    // dp[i][j] = Math (Math(dp[i+1][j],dp[i][j+1]),1)
+    // 首先我们定义dp[i][j] 表示 当骑士走到i，j 这个位置之后，至少需要多少血量才能存活
+    // 如果我们仍然按照从左上走向右下的方式来做的话 会有问题，因为dp[i][j] 依赖后面的值，但是我们在遍历时没办法获取到后面的值
+    // 所以我们考虑从结果出发，对m*n的二维数组而言，dp[m-1][n-1] 定义为当骑士到这仍然存活需要的最低血量，这个是确定的 = Math.max(1 - dungeon[m - 1][n - 1], 1);
+    // 这边去max的原因是骑士的最低血量不能低于1
+    // dp[i][j] 的动态转移方程是 我们需要计算出 dp[i][j] 这个点 对应的右边一格的位置dp[i+1][j]和下面一格的位置 dp[i][j+1]
+    // 这两个值是取较大的一个还是较小的一个呢 我们记 右边一格的数字是A，下面的一格的数字为B 假设A=5，B =1 我们记原数组中的 dungeon[i][j] 的值是C
+    // dp[i][j] + C >= A | B  dp[i][j] >= A | B - C 当C 固定的时候 取A或者B中的最小值，可得dp[i][j] 的最小值 特别的 dp[i][j]是需要>=1 的 所以当 A | B -C <=0 时，dp[i][j] =1
     public int calculateMinimumHP(int[][] dungeon) {
         // 对一些边界情况进行处理
         if (dungeon == null) {
@@ -40,7 +35,9 @@ public class Solution_174 {
         if (n == 0) {
             return 1;
         }
+        // dp[i][j] 表示 当骑士走到i，j 这个位置之后，至少需要多少血量才能存活
         int[][] dp = new int[m][n];
+        // 对一些无法用动态转移方程推导的数字先进行初始化
         dp[m - 1][n - 1] = Math.max(1 - dungeon[m - 1][n - 1], 1);
         for (int i = m - 2; i > -1; i--) {
             dp[i][n - 1] = Math.max(dp[i + 1][n - 1] - dungeon[i][n - 1], 1);
@@ -48,10 +45,13 @@ public class Solution_174 {
         for (int i = n - 2; i > -1; i--) {
             dp[m - 1][i] = Math.max(dp[m - 1][i + 1] - dungeon[m - 1][i], 1);
         }
+
         for (int i = m - 2; i > -1; i--) {
             for (int j = n - 2; j > -1; j--) {
-                int dest = Math.min(dp[i][j+1],dp[i+1][j]);
-                dp[i][j] = Math.max(dest-dungeon[i][j],1);
+                // 先计算出 右面和下面的数字的最小值，这个最小值 一定是大于等于1的，
+                int dest = Math.min(dp[i][j + 1], dp[i + 1][j]);
+                // 如果当前房间可以获得10血量，右面的只需求1血量，下面的只需求5血量，那么最后算出 dp[i][j] 只需要-9血量就可以，这与骑士的血量必须大于等于一矛盾
+                dp[i][j] = Math.max(dest - dungeon[i][j], 1);
             }
         }
         return dp[0][0];
