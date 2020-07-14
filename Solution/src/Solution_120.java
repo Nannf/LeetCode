@@ -31,9 +31,37 @@ public class Solution_120 {
         System.out.println(minimumTotal(triangle));
     }
 
+    public static int minimumTotal(List<List<Integer>> triangle) {
+        if (triangle == null || triangle.size() == 0) {
+            return 0;
+        }
+        int m = triangle.size();
+        int maxSize = triangle.get(triangle.size() - 1).size();
+        if (maxSize == 0) {
+            return 0;
+        }
+
+        int[][] dp = new int[m][maxSize];
+        dp[0][0] = triangle.get(0).get(0);
+        for (int i = 1; i < m; i++) {
+            dp[i][0] = dp[i - 1][0] + triangle.get(i).get(0);
+        }
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < i; j++) {
+                dp[i][j] = Math.min(dp[i - 1][j - 1], dp[i - 1][j]) + triangle.get(i).get(j);
+            }
+            dp[i][i] = dp[i-1][i-1] +  triangle.get(i).get(i);
+        }
+        int ans = Integer.MAX_VALUE;
+        for (int i : dp[m - 1]) {
+            ans = Math.min(i, ans);
+        }
+        return ans;
+    }
+
     // 我们定义dp[i][j] 为当移动到i，j这个位置时的最大数值
     // 动态转移方程是 dp[i][j] = dp[]
-    public static int minimumTotal(List<List<Integer>> triangle) {
+    public static int minimumTotal_Ans1(List<List<Integer>> triangle) {
         if (triangle == null || triangle.size() == 0) {
             return 0;
         }
@@ -56,30 +84,24 @@ public class Solution_120 {
                 int highLeft = Integer.MAX_VALUE;
                 int highOn = Integer.MAX_VALUE;
                 if (leftIndex <= onSize - 1) {
-                    highLeft = dp[i-1][j-1];
+                    highLeft = dp[i - 1][j - 1];
                 }
                 if (onIndex <= onSize - 1) {
-                    highOn = dp[i-1][j];
+                    highOn = dp[i - 1][j];
                 }
                 int current = Integer.MAX_VALUE;
-                if (j <= triangle.get(i).size() -1) {
+                if (j <= triangle.get(i).size() - 1) {
                     current = triangle.get(i).get(j);
                 }
                 dp[i][j] = Math.min(highLeft, highOn) + current;
             }
         }
         int ans = Integer.MAX_VALUE;
-        for (int i : dp[m-1]) {
-            ans = Math.min(i,ans);
+        for (int i : dp[m - 1]) {
+            ans = Math.min(i, ans);
         }
         return ans;
     }
-
-
-
-
-
-
 
 
     private static List<List<Integer>> init() {
