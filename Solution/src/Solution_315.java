@@ -1,6 +1,5 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+
 
 /**
  * @auth Nannf
@@ -15,16 +14,20 @@ import java.util.List;
  * 2 的右侧仅有 1 个更小的元素 (1).
  * 6 的右侧有 1 个更小的元素 (1).
  * 1 的右侧有 0 个更小的元素.
+ *
+ * [26,78,27,100,33,67,90,23,66,5,38,7,35,23,52,22,83,51,98,69,81,32,78,28,94,13,2,97,3,76,99,51,9,21,84,66,65,36,100,41]
+ *
+ * [10,27,10,35,12,22,28,8,19,2,12,2,9,6,12,5,17,9,19,12,14,6,12,5,12,3,0,10,0,7,8,4,0,0,4,3,2,0,1,0]
  */
 public class Solution_315 {
+    static Map<Integer, Integer> map = new HashMap<>();
 
     public static void main(String[] args) {
-        int[] nums = new int[]{1,1};
-        System.out.println(countSmaller(nums).toString());
+        int[] nums = new int[]{26,78,27,100,33,67,90,23,66,5,38,7,35,23,52,22,83,51,98,69,81,32,78,28,94,13,2,97,3,76,99,51,9,21,84,66,65,36,100,41};
+        System.out.println(countSmaller_FailedAns(nums).toString());
     }
 
-
-    public  static List<Integer> countSmaller(int[] nums) {
+    public List<Integer> countSmaller(int[] nums) {
         List<Integer> list = new ArrayList<>();
         if (nums.length == 0) {
             return list;
@@ -33,47 +36,82 @@ public class Solution_315 {
             list.add(0);
             return list;
         }
-        int n = nums.length;
-        int[] nums2 = new int[n];
-        System.arraycopy(nums, 0, nums2, 0, n);
-        Arrays.sort(nums);
-        for (int i = 0; i < nums2.length -1; i++) {
-            int index = findIndex(nums2[i], nums);
-            int tmp = index - i;
-            if (tmp > 0) {
-                list.add(tmp);
-            } else if (tmp == 0) {
-                if (index > 0) {
-                    list.add(1);
-                } else {
-                    list.add(0);
-                }
-            } else {
-                list.add(0);
-            }
+        int[] numsCopy = new int[nums.length];
+        System.arraycopy(nums, 0, numsCopy, 0, nums.length);
+        Arrays.sort(numsCopy);
+        for (int i : nums) {
+
         }
-        list.add(0);
+    }
+
+
+
+
+    public static List<Integer> countSmaller_FailedAns(int[] nums) {
+        map.clear();
+        List<Integer> list = new ArrayList<>();
+        if (nums.length == 0) {
+            return list;
+        }
+        if (nums.length == 1) {
+            list.add(0);
+            return list;
+        }
+        int[] numsCopy = new int[nums.length];
+        System.arraycopy(nums, 0, numsCopy, 0, nums.length);
+        int n = nums.length;
+        sort(nums, 0, n - 1);
+        for (int i : numsCopy) {
+            list.add(map.get(i) == null ? 0 : map.get(i));
+        }
         return list;
     }
 
-    private static int findIndex(int i, int[] nums) {
-        int l = 0;
-        int h = nums.length - 1;
-        return find(nums, i, l, h);
+    private static void sort(int[] nums, int l, int h) {
+        if (l >= h) {
+            return;
+        }
+        int mid = (l + h) / 2;
+        sort(nums, l, mid);
+        sort(nums, mid + 1, h);
+        merge(nums, l, mid, h);
     }
 
-    private static int find(int[] nums, int i, int l, int h) {
-        int mid = (l + h) / 2;
-        if (nums[mid] == i) {
-            return mid;
+    private static void merge(int[] nums, int l, int mid, int h) {
+        int[] tmp = new int[h - l + 1];
+
+        int i = l;
+        int j = mid + 1;
+        int k = 0;
+        while (i <= mid && j <= h) {
+            if (nums[i] <= nums[j]) {
+                tmp[k++] = nums[i++];
+            } else {
+                if (map.containsKey(nums[i])) {
+                    map.put(nums[i], map.get(nums[i]) + 1);
+                } else {
+                    int m = i;
+                    while (m <= mid) {
+                        if (map.containsKey(nums[m])) {
+                            map.put(nums[m], map.get(nums[m]) + 1);
+                        } else {
+                            map.put(nums[m], 1);
+                        }
+                        m++;
+                    }
+
+                }
+                tmp[k++] = nums[j++];
+            }
         }
-        if (nums[mid] > i) {
-            h = mid -1;
-            return find(nums,i,l,h);
-        } else {
-            l = mid + 1;
-            return find(nums,i,l,h);
+
+        for (; i <= mid; i++) {
+            tmp[k++] = nums[i];
         }
+        for (; j <= h; j++) {
+            tmp[k++] = nums[j];
+        }
+        System.arraycopy(tmp, 0, nums, l, h - l + 1);
     }
 
 
