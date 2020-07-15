@@ -14,60 +14,44 @@ import java.util.*;
  * 2 的右侧仅有 1 个更小的元素 (1).
  * 6 的右侧有 1 个更小的元素 (1).
  * 1 的右侧有 0 个更小的元素.
- *
+ * <p>
  * [26,78,27,100,33,67,90,23,66,5,38,7,35,23,52,22,83,51,98,69,81,32,78,28,94,13,2,97,3,76,99,51,9,21,84,66,65,36,100,41]
- *
+ * <p>
  * [10,27,10,35,12,22,28,8,19,2,12,2,9,6,12,5,17,9,19,12,14,6,12,5,12,3,0,10,0,7,8,4,0,0,4,3,2,0,1,0]
  */
 public class Solution_315 {
-    static Map<Integer, Integer> map = new HashMap<>();
+    int[] index;
+    int[] ans;
 
     public static void main(String[] args) {
         int[] nums = new int[]{26,78,27,100,33,67,90,23,66,5,38,7,35,23,52,22,83,51,98,69,81,32,78,28,94,13,2,97,3,76,99,51,9,21,84,66,65,36,100,41};
-        System.out.println(countSmaller_FailedAns(nums).toString());
-    }
-
-    public List<Integer> countSmaller(int[] nums) {
-        List<Integer> list = new ArrayList<>();
-        if (nums.length == 0) {
-            return list;
-        }
-        if (nums.length == 1) {
-            list.add(0);
-            return list;
-        }
-        int[] numsCopy = new int[nums.length];
-        System.arraycopy(nums, 0, numsCopy, 0, nums.length);
-        Arrays.sort(numsCopy);
-        for (int i : nums) {
-
-        }
+        System.out.println(new Solution_315().countSmaller_FailedAns(nums).toString());
     }
 
 
-
-
-    public static List<Integer> countSmaller_FailedAns(int[] nums) {
-        map.clear();
-        List<Integer> list = new ArrayList<>();
-        if (nums.length == 0) {
-            return list;
-        }
-        if (nums.length == 1) {
-            list.add(0);
-            return list;
-        }
-        int[] numsCopy = new int[nums.length];
-        System.arraycopy(nums, 0, numsCopy, 0, nums.length);
+    public List<Integer> countSmaller_FailedAns(int[] nums) {
         int n = nums.length;
+        List<Integer> list = new ArrayList<>();
+        if (n == 0) {
+            return list;
+        }
+        if (n == 1) {
+            list.add(0);
+            return list;
+        }
+        index = new int[n];
+        ans = new int[n];
+        for (int i = 0; i < n; i++) {
+            index[i] = i;
+        }
         sort(nums, 0, n - 1);
-        for (int i : numsCopy) {
-            list.add(map.get(i) == null ? 0 : map.get(i));
+        for (int i : ans) {
+            list.add(i);
         }
         return list;
     }
 
-    private static void sort(int[] nums, int l, int h) {
+    private void sort(int[] nums, int l, int h) {
         if (l >= h) {
             return;
         }
@@ -77,41 +61,28 @@ public class Solution_315 {
         merge(nums, l, mid, h);
     }
 
-    private static void merge(int[] nums, int l, int mid, int h) {
-        int[] tmp = new int[h - l + 1];
-
-        int i = l;
-        int j = mid + 1;
-        int k = 0;
-        while (i <= mid && j <= h) {
-            if (nums[i] <= nums[j]) {
-                tmp[k++] = nums[i++];
+    private void merge(int[] a, int l, int mid, int r) {
+        int[] tempIndex = new int[r - l + 1];
+        int i = l, j = mid + 1, k = 0;
+        while (i <= mid && j <= r) {
+            if (a[index[i]] <= a[index[j]]) {
+                tempIndex[k++] = index[i++];
             } else {
-                if (map.containsKey(nums[i])) {
-                    map.put(nums[i], map.get(nums[i]) + 1);
-                } else {
-                    int m = i;
-                    while (m <= mid) {
-                        if (map.containsKey(nums[m])) {
-                            map.put(nums[m], map.get(nums[m]) + 1);
-                        } else {
-                            map.put(nums[m], 1);
-                        }
-                        m++;
-                    }
-
+                tempIndex[k++] = index[j++];
+                ans[index[i]] += 1;
+                int tmp = i + 1;
+                while (tmp <= mid) {
+                    ans[index[tmp++]] += 1;
                 }
-                tmp[k++] = nums[j++];
             }
         }
-
         for (; i <= mid; i++) {
-            tmp[k++] = nums[i];
+            tempIndex[k++] = index[i++];
         }
-        for (; j <= h; j++) {
-            tmp[k++] = nums[j];
+        for (; j <= r; j++) {
+            tempIndex[k++] = index[j++];
         }
-        System.arraycopy(tmp, 0, nums, l, h - l + 1);
+        System.arraycopy(tempIndex, 0, index, l, r - l + 1);
     }
 
 
