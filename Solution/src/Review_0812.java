@@ -30,13 +30,12 @@ public class Review_0812 {
     List<List<String>> ans = new ArrayList<>();
 
     public static void main(String[] args) {
-        for (List<String> str : new Review_0812().solveNQueens(2)) {
+        for (List<String> str : new Review_0812().solveNQueens(4)) {
             System.out.println(str);
         }
     }
 
     public List<List<String>> solveNQueens(int n) {
-        // N皇后小于三时无解
         if (n <= 0) {
             return Collections.emptyList();
         }
@@ -51,6 +50,8 @@ public class Review_0812 {
     public void down(int row, int n, int[] result) {
         // 当已经下到第n个，说明已经下完了n-1行，不需要继续下了
         if (row == n) {
+            // 当有一个新的解出现时，原先的解一定被替换掉了
+            // 之所以这边不重置result是因为之前的结果对我们还有用
             ans.add(build(result, n));
             return;
         }
