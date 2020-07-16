@@ -76,10 +76,10 @@ public class Solution_315 {
                 }
             }
         }
-        for (; i <= mid; i++) {
+        for (; i <= mid;) {
             tempIndex[k++] = index[i++];
         }
-        for (; j <= r; j++) {
+        for (; j <= r; ) {
             tempIndex[k++] = index[j++];
         }
         System.arraycopy(tempIndex, 0, index, l, r - l + 1);
