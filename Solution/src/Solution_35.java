@@ -29,7 +29,7 @@ public class Solution_35 {
         int low = 0;
         int high = n - 1;
         while (low <= high) {
-            int mid = (low + high) / 2;
+            int mid = low + ((high - low) >> 1);
             // 如果中间的值大于等于给定的值，
             if (nums[mid] >= target) {
                 // 如果已经是第一个值，或者前一个数小于给定的数值
