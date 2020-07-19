@@ -25,6 +25,7 @@ public class Solution_4 {
         System.out.println(new Solution_4().findMedianSortedArrays(nums1,nums2));
     }
 
+    // 类似两个有序单链表的合并
     public double findMedianSortedArrays(int[] nums1, int[] nums2) {
         if (nums1 == null || nums1.length == 0) {
             return caluMedianNum(nums2);

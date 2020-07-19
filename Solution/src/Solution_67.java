@@ -32,24 +32,24 @@ public class Solution_67 {
         if (b == null || b.trim().isEmpty() || b == "0") {
             return a;
         }
-        int n = Math.max(a.length(), b.length());
+        int n = Math.min(a.length(), b.length());
         int symbol = 0;
         Stack<Integer> result = new Stack<>();
         for (int i = n - 1; i >= 0; i--) {
-                int tmp = a.charAt(i) + b.charAt(i) + symbol;
+            int tmp = a.charAt(i)-'0' + b.charAt(i)-'0' + symbol;
             result.push(tmp % 2);
             symbol = tmp / 2;
         }
         if(a.length()> n) {
             for (int i = n; i< a.length();i++) {
-                int tmp = a.charAt(i)  + symbol;
+                int tmp = a.charAt(i)-'0'  + symbol;
                 result.push(tmp % 2);
                 symbol = tmp / 2;
             }
         }
         if(b.length()> n) {
             for (int i = n; i< b.length();i++) {
-                int tmp = b.charAt(i) + symbol;
+                int tmp = b.charAt(i)-'0' + symbol;
                 result.push(tmp % 2);
                 symbol = tmp / 2;
             }
