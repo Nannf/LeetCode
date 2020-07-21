@@ -27,6 +27,15 @@ public class Solution_72 {
         System.out.println(new Solution_72().minDistance("horse", "ros"));
     }
 
+    // 如何判定一个程序是否可以通过动态规划来解决呢？
+    // 一个模型： 多阶段决策最优解模型，说人话就是可以从 00 --> nn 是有阶段的，也就是 是一个推导的过程，我们先知道了最简单的，然后根据最简单的总结出规律，然后推到n
+    // 就本题而言，最简单的就是 当A 和 B 都是空字符，或者有一个是空字符，这种情况是最简单的，然后在慢慢推到下去
+    // 特征一 : 最优子结构，就是最终的结果，可以由子问题的最优解推导出来
+    // 就本题而言，horse --> ros 可以由 子问题 hors ->ros horse -> ro hors ->ro  这三个子问题的最优解推导出来
+    // 特征二： 重复子问题 就是到达一个状态 会有不同的解法
+    // 就本题而言，horse --> ros 可以由 子问题 hors ->ros horse -> ro hors ->ro  这三个子问题的最优解推导出来
+    // 特征三： 无后效性 就是 我推导一个状态 只需考虑我之前的状态 无需考虑之后的状态
+    // 就本题而言，
     public int minDistance(String word1, String word2) {
         int l1 = word1.length();
         int l2 = word2.length();
@@ -39,6 +48,7 @@ public class Solution_72 {
         }
         for (int i = 1; i <= l1; i++) {
             for (int j = 1; j <= l2; j++) {
+
                 if (word1.charAt(i-1) == word2.charAt(j-1)) {
                     dp[i][j] = dp[i - 1][j - 1];
                 } else {
