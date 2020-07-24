@@ -46,7 +46,6 @@ public class Review_0812 {
         return ans;
     }
 
-    // 下棋子
     public void down(int row, int n, int[] result) {
         // 当已经下到第n个，说明已经下完了n-1行，不需要继续下了
         if (row == n) {
@@ -59,6 +58,35 @@ public class Review_0812 {
             if (isOk(row, column, result, n)) {
                 result[row] = column;
                 down(row + 1, n, result);
+            }
+        }
+    }
+
+
+    public List<List<String>> solveNQueens_Ans1(int n) {
+        if (n <= 0) {
+            return Collections.emptyList();
+        }
+        // 思路就是探索出所有的解，并对其中满足条件的解进行记录
+        int[] result = new int[n];
+        Arrays.fill(result, -1);
+        down_ans1(0, n, result);
+        return ans;
+    }
+
+    // 下棋子
+    public void down_ans1(int row, int n, int[] result) {
+        // 当已经下到第n个，说明已经下完了n-1行，不需要继续下了
+        if (row == n) {
+            // 当有一个新的解出现时，原先的解一定被替换掉了
+            // 之所以这边不重置result是因为之前的结果对我们还有用
+            ans.add(build(result, n));
+            return;
+        }
+        for (int column = 0; column < n; column++) {
+            if (isOk(row, column, result, n)) {
+                result[row] = column;
+                down_ans1(row + 1, n, result);
             }
         }
     }
