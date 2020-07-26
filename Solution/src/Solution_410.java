@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 /**
  * @auth Nannf
  * @date 2020/7/25 13:56
@@ -25,21 +27,32 @@ public class Solution_410 {
     // 最值 想到动态规划
     // 满足多阶段决策最优解模型吗？
     public int splitArray(int[] nums, int m) {
-        // 本题默认m<=n 不用额外的判断
         int n = nums.length;
+
+        if (m <= 0) {
+            return 0;
+        }
+        if (m == 1) {
+            return countB(nums, 0, n - 1);
+        }
+        if (m == n) {
+            Arrays.sort(nums);
+            return nums[n - 1];
+        }
         // dp[i][j] 表示前i个数被分成j段所得到的最大连续子数组的最小值
         // 题目要求的是 前n个数被分成m段所得到的最大连续子数组的最小值
         // 解题思路和数学归纳法类似，先找一个中间数k k<=i f[k][j-1] 表示前k个数被分成j-1段所得到的最大值记为A，然后 还有一个 k+1~i 之间的所有的和加起来值记为B 取 max(A,B)就是一个最大值的解
         // 然后把 k = 0~i 的所有的值汇合起来，取所有最大值中的最小值 即为f[i][j] 的解
         // j <= i
         int[][] dp = new int[n][m];
+
         // 外层的循环是
-        for (int i = 0; i < n; i++) {
+        for (int i = 1; i < n; i++) {
             // 里层就是k k从 1 - i+1
-            for (int j = 1; j <= i + 1; j++) {
-                int a = dp[j][j- 1];
-                int b = countB(nums, j -1, i);
-                dp[i][j] = Math.min(Math.max(a, b), dp[i][j - 1]);
+            for (int j = 1; j <= Math.min(i, m); j++) {
+                for (int k = 1; k < j; k++) {
+                    dp[i][j] = Math.min(dp[i][j],Math.max(dp[k][j-1],countB(nums,k+1,i)));
+                }
             }
         }
         return dp[n][m];
