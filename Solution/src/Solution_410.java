@@ -24,9 +24,42 @@ import java.util.Arrays;
  * 因为此时这两个子数组各自的和的最大值为18，在所有情况中最小。
  */
 public class Solution_410 {
+
+    public static void main(String[] args) {
+        int[] nums = {7,2,5,10,8};
+        System.out.println(splitArray(nums,3));
+    }
+
+
+
+
+
+
+    public static int splitArray(int[] nums, int m) {
+        int n = nums.length;
+        int[][] f = new int[n + 1][m + 1];
+        for (int i = 0; i <= n; i++) {
+            Arrays.fill(f[i], Integer.MAX_VALUE);
+        }
+        int[] sub = new int[n + 1];
+        for (int i = 0; i < n; i++) {
+            sub[i + 1] = sub[i] + nums[i];
+        }
+        f[0][0] = 0;
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= Math.min(i, m); j++) {
+                for (int k = 0; k < i; k++) {
+                    f[i][j] = Math.min(f[i][j], Math.max(f[k][j - 1], sub[i] - sub[k]));
+                }
+            }
+        }
+        return f[n][m];
+    }
+
+
     // 最值 想到动态规划
     // 满足多阶段决策最优解模型吗？
-    public int splitArray(int[] nums, int m) {
+    public int splitArray_lj(int[] nums, int m) {
         int n = nums.length;
 
         if (m <= 0) {
