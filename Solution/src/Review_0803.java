@@ -20,15 +20,20 @@ public class Review_0803 {
         int high = nums.length - 1;
         while (low <= high) {
             int mid = low + ((high - low) >> 1);
+
             if (nums[mid] == mid) {
-                // 找到第一个
+                // 如何判断当前的是第一个呢
+                // mid == 0 || nums[mid - 1] != mid - 1 可以吗  因为是有重复的 所以这个并不行
+                // 举个例子 {0,2,2,4,6} 第一次二分会找到第三个数，而且 它前面的数 也满足上面的判断 但是这样的话 我们得出的结果就是2 实际上是0
                 if (mid == 0 || nums[mid - 1] != mid - 1) {
                     return mid;
                 }
                 high = mid - 1;
             }
+            // nums[mid] > mid  能推导出nums[mid+1] 一定大于 mid + 1 不能
+            // 因为这个是有重复的 假设mid = 1,nums[mid]=2 nums[mid +1] 也等于2
             if (nums[mid] > mid) {
-                high = mid -1;
+                high = mid - 1;
             } else {
                 low = mid + 1;
             }
