@@ -15,11 +15,34 @@ import java.util.Arrays;
 public class Solution_152 {
 
     public static void main(String[] args) {
-        int[] nums = {-2,0,-1};
+        int[] nums = {-2, 0, -1};
         System.out.println(new Solution_152().maxProduct(nums));
     }
 
+
     public int maxProduct(int[] nums) {
+        int ans = Integer.MIN_VALUE;
+        int n = nums.length;
+
+        // 我们发现上一层的运算，其实只依赖下面一层的结果，没有必要把所有的结果全部保存下来
+        int[] dp = new int[n];
+        Arrays.fill(dp, 1);
+        for (int i = n - 1; i >= 0; i--) {
+            for (int j = 0; j <= n - 1 - i; j++) {
+                dp[j] = dp[j] * nums[i];
+                ans = Math.max(dp[j],ans);
+            }
+        }
+        return ans;
+    }
+
+    /**
+     * 超出内存限制
+     *
+     * @param nums
+     * @return
+     */
+    public int maxProduct_ans1(int[] nums) {
         int ans = Integer.MIN_VALUE;
         int n = nums.length;
         // 不能从前往后动态规划，因为这样会依赖后面的值
@@ -32,8 +55,8 @@ public class Solution_152 {
         }
         for (int i = n - 1; i >= 0; i--) {
             for (int j = 0; j <= n - 1 - i; j++) {
-                dp[i][j] = dp[i+1][j] * nums[i];
-                ans = Math.max(dp[i][j],ans);
+                dp[i][j] = dp[i + 1][j] * nums[i];
+                ans = Math.max(dp[i][j], ans);
             }
         }
         return ans;
