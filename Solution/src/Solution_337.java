@@ -25,7 +25,7 @@
  * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
  */
 public class Solution_337 {
-     class TreeNode {
+    class TreeNode {
         int val;
         TreeNode left;
         TreeNode right;
@@ -38,6 +38,7 @@ public class Solution_337 {
     /**
      * 先用递归来解决，我们定义一个函数的功能是给定一个节点，能盗取的最大的值
      * 最大的值=当前节点的值的大小+其所有孙子的钱的大小 和其左右孩子加起来的大小 之间的最大值
+     *
      * @param root
      * @return
      */
@@ -52,11 +53,11 @@ public class Solution_337 {
         // 如果左孩子节点不为空，那么计算左孩子节点的值
         // 左孩子节点的值等于
         if (root.left != null) {
-            money += rob(root.left.left) +rob(root.left.right);
+            money += rob(root.left.left) + rob(root.left.right);
         }
         if (root.right != null) {
-            money+=rob(root.right.left)+rob(root.right.right);
+            money += rob(root.right.left) + rob(root.right.right);
         }
-        return Math.max(money,leftMoney+rightMoney);
+        return Math.max(money, leftMoney + rightMoney);
     }
 }
