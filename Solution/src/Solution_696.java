@@ -28,18 +28,29 @@ import java.util.List;
 public class Solution_696 {
 
     public static void main(String[] args) {
-        System.out.println(new Solution_696().countBinarySubstrings("00110"));
+        System.out.println(new Solution_696().countBinarySubstrings("00110011"));
     }
 
+    // 这个解法是看到官方的题解得出的
     public int countBinarySubstrings(String s) {
-        int ans = 0;
-        for (int i = 0; i < s.length(); i++) {
-            for (int j = i + 1; j <= s.length(); j+=2) {
-                if (judge(s.substring(i, j))) {
-                    ans++;
+        int ans =0;
+
+        char tmp = s.charAt(0);
+        int last = 0;
+        int current = 1;
+        for (int i = 1; i < s.length(); i++) {
+            if (s.charAt(i) == tmp) {
+                current++;
+            } else {
+                if (last != 0) {
+                    ans += Math.min(last, current);
                 }
+                last = current;
+                current = 1;
+                tmp = s.charAt(i);
             }
         }
+        ans += Math.min(last, current);
         return ans;
     }
 
