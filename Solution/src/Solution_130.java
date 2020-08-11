@@ -31,14 +31,13 @@ import java.util.List;
 public class Solution_130 {
 
     public static void main(String[] args) {
-        char[][] chars ={{'O','O','O'},{'O','O','O'},{'O','O','O'}};
+        char[][] chars ={{'O','X','X','O','X'},{'X','O','O','X','O'},{'X','O','X','O','X'},{'O','X','O','O','O'},{'X','X','O','X','O'}};
         new Solution_130().solve(chars);
-
+        System.out.println(1);
     }
 
 
     public void solve(char[][] board) {
-
         // 先找到所有边界上的o以及和边界相连的o的下标索引
         int n = board.length;
         if (n == 0) {
@@ -88,18 +87,30 @@ public class Solution_130 {
 
     }
 
+    // 这个方法的目的，是给定一个坐标点，这个点一定是联通的，找出这个点可以关联出来的所有点
     private void convertAround(char[][] board, int i, int j, int n, int m) {
-        if (i < 0 || i >= n || j < 0 || j >= m || board[i][j] == 'X') {
+        if (i < 1 || i > n-1 || j < 1 || j > m-1 || board[i][j] == 'X') {
             return;
         }
-        if (board[i][j] == 'O') {
-            board[i][j] = 'Y';
-            return;
+        if(board[i][j-1] == 'O') {
+            board[i][j-1] = 'Y';
+            convertAround(board,i,j-1,n,m);
         }
 
-        convertAround(board, i - 1, j, n, m);
-        convertAround(board, i, j - 1, n, m);
-        convertAround(board, i, j + 1, n, m);
+        if(board[i][j+1] == 'O') {
+            board[i][j+1] = 'Y';
+            convertAround(board,i,j+1,n,m);
+        }
+
+        if(board[i-1][j] == 'O') {
+            board[i-1][j] = 'Y';
+            convertAround(board,i-1,j,n,m);
+        }
+
+        if(board[i+1][j] == 'O') {
+            board[i+1][j] = 'Y';
+            convertAround(board,i+1,j,n,m);
+        }
     }
 
 }
