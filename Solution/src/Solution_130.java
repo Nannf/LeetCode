@@ -30,6 +30,12 @@ import java.util.List;
  */
 public class Solution_130 {
 
+    public static void main(String[] args) {
+        char[][] chars ={{'O','O','O'},{'O','O','O'},{'O','O','O'}};
+        new Solution_130().solve(chars);
+
+    }
+
 
     public void solve(char[][] board) {
 
@@ -88,7 +94,9 @@ public class Solution_130 {
         }
         if (board[i][j] == 'O') {
             board[i][j] = 'Y';
+            return;
         }
+
         convertAround(board, i - 1, j, n, m);
         convertAround(board, i, j - 1, n, m);
         convertAround(board, i, j + 1, n, m);
