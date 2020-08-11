@@ -38,12 +38,12 @@ public class Solution_130 {
 
 
     public void solve(char[][] board) {
-        // 先找到所有边界上的o以及和边界相连的o的下标索引
         int n = board.length;
         if (n == 0) {
             return;
         }
         int m = board[0].length;
+        // 接下来的两次循环都是给边界上的O变为Y
         for (int i = 0; i < m; i++) {
             if (board[0][i] == 'O') {
                 board[0][i] = 'Y';
@@ -65,14 +65,18 @@ public class Solution_130 {
         for (int i = 1; i < n - 1; i++) {
             for (int j = 1; j < m - 1; j++) {
                 if (board[i][j] == 'O') {
+                    // 如果为O 的点的前后左右有Y的点，表示是联通的
                     if (board[i - 1][j] == 'Y' || board[i][j - 1] == 'Y' || board[i + 1][j] == 'Y' || board[i][j + 1] == 'Y') {
+                        // 当前的点变为Y
                         board[i][j] = 'Y';
+                        // 并以该点为圆心，寻找所有的其他的联通点
                         convertAround(board, i, j, n, m);
                     }
                 }
             }
         }
 
+        // 结束时，把所有Y变为O，所有O 变为X
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
                 if (board[i][j] == 'Y') {
@@ -89,9 +93,12 @@ public class Solution_130 {
 
     // 这个方法的目的，是给定一个坐标点，这个点一定是联通的，找出这个点可以关联出来的所有点
     private void convertAround(char[][] board, int i, int j, int n, int m) {
+        // 把点的活动范围限定在围栏内，且当当前点是X时，退出循环
         if (i < 1 || i > n-1 || j < 1 || j > m-1 || board[i][j] == 'X') {
             return;
         }
+        // 如果当前点的左侧是O 表示这个左边的点需要同化，并把左边这个点作为新的点
+        // 下面这个是类似的
         if(board[i][j-1] == 'O') {
             board[i][j-1] = 'Y';
             convertAround(board,i,j-1,n,m);
