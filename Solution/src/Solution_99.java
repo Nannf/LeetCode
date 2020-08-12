@@ -73,7 +73,7 @@ public class Solution_99 {
         TreeNode node2 = new TreeNode(2);
         TreeNode node3 = new TreeNode(3);
         node1.left = node3;
-        node1.right = node2;
+        node3.right = node2;
         new Solution_99().recoverTree(node1);
         System.out.println(1);
     }
@@ -115,14 +115,28 @@ public class Solution_99 {
         for (TreeNode node : leftChildren) {
             if (root.val < node.val) {
                 leftFind = true;
-                leftNode = node;
+                if (leftNode == null) {
+                    leftNode = node;
+                } else {
+                    // 左边取最大的
+                    if (leftNode.val < node.val) {
+                        leftNode = node;
+                    }
+                }
             }
         }
         List<TreeNode> rightChildren = getRightChildren(root);
         for (TreeNode node : rightChildren) {
             if (root.val > node.val) {
                 rightFind = true;
-                rightNode = node;
+                if (rightNode == null) {
+                    rightNode = node;
+                } else {
+                    // 右边取最小的
+                    if (rightNode.val > node.val) {
+                        rightNode = node;
+                    }
+                }
             }
         }
         isFind = leftFind || rightFind;
