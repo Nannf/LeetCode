@@ -51,7 +51,8 @@ public class Solution_200 {
                     // 岛屿数量增加一
                     islandCount++;
                     // 把周围连接的1同化
-                    convertAroud(i, j, n, m, grid);
+//                    dfs(i, j, n, m, grid);
+                    bfs(i,j,n,m,grid);
                 }
             }
         }
@@ -59,7 +60,19 @@ public class Solution_200 {
 
     }
 
-    private void convertAroud(int i, int j, int n, int m, char[][] grid) {
+    private void bfs(int i, int j, int n, int m, char[][] grid) {
+
+    }
+
+    /**
+     * 深度优先遍历
+     * @param i
+     * @param j
+     * @param n
+     * @param m
+     * @param grid
+     */
+    private void dfs(int i, int j, int n, int m, char[][] grid) {
         // 递归终止条件
         if (i < 0 || i >= n || j < 0 || j >= m || grid[i][j] != '1') {
             return;
@@ -68,12 +81,12 @@ public class Solution_200 {
         grid[i][j] = 'a';
         // 其实这边的上下左右，就是与该点相连的点，就是深度优先搜索
         // 上
-        convertAroud(i-1,j,n,m,grid);
+        dfs(i-1,j,n,m,grid);
         // 下
-        convertAroud(i+1,j,n,m,grid);
+        dfs(i+1,j,n,m,grid);
         // 左
-        convertAroud(i,j-1,n,m,grid);
+        dfs(i,j-1,n,m,grid);
         // 右
-        convertAroud(i,j+1,n,m,grid);
+        dfs(i,j+1,n,m,grid);
     }
 }

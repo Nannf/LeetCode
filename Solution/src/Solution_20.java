@@ -1,3 +1,7 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
+
 /**
  * @author Nannf
  * @date 2020/6/1 19:13
@@ -15,12 +19,47 @@ public class Solution_20 {
 
     public static void main(String[] args) {
         String str = "()";
-        if (isValid(str)) {
+        if (new Solution_20().isValid(str)) {
             System.out.println("bingo!");
         }
     }
 
-    public static boolean isValid(String s) {
+
+    static Map<Character,Character> map = new HashMap<>();
+    static {
+        map.put(')','(');
+        map.put('}','{');
+        map.put(']','[');
+    }
+    public boolean isValid(String s) {
+        int n = s.length();
+        if (n == 0) {
+            return true;
+        }
+        Stack<Character> stack = new Stack();
+
+        for (int i = 0; i< n; i++) {
+            switch (s.charAt(i)) {
+                case '(':
+                case '{':
+                case '[':
+                    stack.add(s.charAt(i));
+                    break;
+                default:
+                    if (stack.isEmpty()) {
+                        return false;
+                    }
+                    char c= stack.pop();
+                    char t = map.get(s.charAt(i));
+                    if (c != t) {
+                        return false;
+                    }
+            }
+        }
+        return stack.isEmpty();
+    }
+
+    public static boolean isValid_ans(String s) {
         int size = 0;
         char[] data = new char[s.length()];
         for (char c : s.toCharArray()) {
