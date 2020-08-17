@@ -29,9 +29,46 @@ import java.util.List;
  */
 public class Solution_5489 {
     public static void main(String[] args) {
-        int[] position = {79,74,57,22};
+        int[] position = {1,2,3,4,5,6,7,8,9,10};
         System.out.println(new Solution_5489().maxDistance(position, 4));
     }
+
+
+    public int maxDistance(int[] position, int m) {
+        int ans = 0;
+        // 先把数组按照从小到大排序，好用二分
+        Arrays.sort(position);
+        // 最小值是1
+        int low = 1;
+        // 最大值是恰好所有的值都在均分点上的时候，是最大的
+        int high = (position[position.length - 1] - position[0]) / (m - 1);
+
+        while (low <= high) {
+            int mid = low + ((high - low) >> 1);
+            // 如果按照中间这个mid次序来排列，看看能否找到这么多的数满足条件
+            if (check(position, mid, m)) {
+                // 说明mid 还是小了，可以接着往上加
+                ans = mid;
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+        return ans;
+    }
+
+    private boolean check(int[] position, int mid, int m) {
+        int cnt = 1;
+        int first = position[0];
+        for (int i = 1; i < position.length; i++) {
+            if (position[i] - first >= mid) {
+                cnt++;
+                first = position[i];
+            }
+        }
+        return cnt >= m;
+    }
+
 
     int result = 0;
 
@@ -39,17 +76,17 @@ public class Solution_5489 {
     // 贪心算法可以做，每次放的时候 就取最小的数组中，最大的那个；
     // 后来发现贪心算法做不了，因为{1,2,3,4,5,6,7,8,9,10}当m=4时会在6，和7之间出问题
     // 回溯可以做，但是时间复杂度时2^(position.length -2)的时间复杂度
-    public int maxDistance(int[] position, int m) {
+    public int maxDistance_backtrace(int[] position, int m) {
         Arrays.sort(position);
         int x = 0;
         int y = position.length - 1;
         result = 0;
         List<Integer> trace = new ArrayList<>();
-        backtrace( trace, position, m - 2);
+        backtrace(trace, position, m - 2);
         return result;
     }
 
-    private void backtrace( List<Integer> trace, int[] position, int m) {
+    private void backtrace(List<Integer> trace, int[] position, int m) {
         if (trace.size() == m) {
             int ans = count(trace, position);
             result = Math.max(result, ans);
@@ -57,7 +94,7 @@ public class Solution_5489 {
         }
         for (int i = 1; i < position.length - 1; i++) {
             trace.add(i);
-            backtrace( trace, position, m);
+            backtrace(trace, position, m);
             trace.remove(trace.size() - 1);
         }
     }
