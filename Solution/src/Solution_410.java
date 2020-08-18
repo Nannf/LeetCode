@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @auth Nannf
@@ -27,12 +29,74 @@ public class Solution_410 {
 
     public static void main(String[] args) {
         int[] nums = {7, 2, 5, 10, 8};
-        System.out.println(splitArray(nums, 3));
+        System.out.println(new Solution_410().splitArray(nums, 2));
     }
+
+    // 使最大值 最小
+    public  int splitArray(int[] nums, int m) {
+        long ans = 0;
+        // 我们知道所有和的最大值 不会小于 数组中的最大值
+        // 所有和的最大值 不会大于 数组中所有数的和
+        // 我们以这两个数字 为边界，
+        long low = 0, high = 0;
+        for (int i = 0; i < nums.length; i++) {
+            high += nums[i];
+            low = Math.max(low, nums[i]);
+        }
+        while (low <= high) {
+            long mid = low + ((high - low) >> 1);
+            if (check(nums, m, mid)) {
+                ans = mid;
+                high = mid -1;
+            } else {
+                low = mid + 1;
+            }
+        }
+        return (int)ans;
+    }
+
+    /**
+     * mid 是我们假设的最大值
+     * 我们使用贪心算法
+     *
+     * @param nums
+     * @param m
+     * @param mid
+     * @return
+     */
+    private  boolean check(int[] nums, int m, long mid) {
+        int cnt = 1;
+        int first = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            // 等于mid 的话，表示还是可以作为一个数组的
+            if (nums[i] + first > mid) {
+                cnt++;
+                first = nums[i];
+            } else {
+                first = first + nums[i];
+            }
+        }
+        // 如果最后划分出的数组数量比实际的要多说明了什么，说明给定的mid值比实际的值要小，多就意味着 假设 多且只多一个，那么这个值理应被分到其中的
+        // 一个数组里面，为什么没有被分进去，因为那个数组的值再加上这个数字就超过了规定的值，说明我们设置的数组的上限小了
+
+        // 如果最后划分出的数组数量比实际的要少说明了什么，按照上面的思路，说明有些值应该被划出来，但是没有被划出来，说明我们设置的mid 太大了
+
+        // 如果最后划分出的数组数量和实际的一样，我们 要返回啥，这里以[1,7,2,8,5]，m=3举例，第一次的mid 就是  12,按照这个mid就划分出了满足条件的3个
+        // 但是12 并不是我们的解，因为我们知道，最后的解是10， 那如果划分的数量 恰好相等，我们假设最后的解是 x,那么x的取值，和这个mid的关系是啥样的呢？
+        // 我们假设 x > mid, 这个不成立，因为扩大取值会导致数组数量的变小，本例是没办法扩大的，但是如果我把数组变成 1,7,2,8,6,如果mid 变大 似乎也是对的
+        // 如此推理 x < mid 也是可能成立的，
+        // 但是我们需要找到最小的那个x的值，在我们不能判断mid 是否就是唯一解的时候，我们需要把mid往小了移动
+        if (cnt > m) {
+            return false;
+        }
+        return true;
+
+    }
+
 
     // 最值 想到动态规划
     // 满足多阶段决策最优解模型吗？
-    public static int splitArray(int[] nums, int m) {
+    public static int splitArray_Dp(int[] nums, int m) {
         int n = nums.length;
         if (m > n) {
             throw new IllegalArgumentException("m 不能超过给定的数组大小！");
