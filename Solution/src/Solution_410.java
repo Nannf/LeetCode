@@ -43,6 +43,8 @@ public class Solution_410 {
             high += nums[i];
             low = Math.max(low, nums[i]);
         }
+        // 二分查找这边的条件是使用 low < high作为终止条件，还是 low <= high 作为终止条件？
+        //
         while (low <= high) {
             long mid = low + ((high - low) >> 1);
             if (check(nums, m, mid)) {
