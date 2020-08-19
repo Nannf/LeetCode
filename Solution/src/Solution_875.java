@@ -34,6 +34,7 @@ public class Solution_875 {
     public int minEatingSpeed(int[] piles, int H) {
         int ans = 0;
         // 我们要求的值 X 代表最少要吃多少
+        // 最大值 是一次只能吃最大那一堆的数量，最少是吃一根
         int high =Integer.MIN_VALUE,low =1;
         for (int i= 0;i< piles.length; i++) {
             high = Math.max(high,piles[i]);
