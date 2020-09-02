@@ -38,10 +38,10 @@ public class Solution_486 {
         }
         int length = nums.length;
         int[][] memo = new int[length][length];
-        for (int i = 0 ; i< length;i++) {
-            Arrays.fill(memo[i],Integer.MIN_VALUE);
+        for (int i = 0; i < length; i++) {
+            Arrays.fill(memo[i], Integer.MIN_VALUE);
         }
-        return dfs(0, length - 1, nums,memo) >= 0;
+        return dfs(0, length - 1, nums, memo) >= 0;
     }
 
     private int dfs(int l, int r, int[] nums, int[][] memo) {
@@ -49,11 +49,11 @@ public class Solution_486 {
             return 0;
         }
         if (memo[l][r] != Integer.MIN_VALUE) {
-            return  memo[l][r];
+            return memo[l][r];
         }
-        int chooseLeft = nums[l] - dfs(l+1,r,nums, memo);
-        int chooseRight = nums[r] - dfs(l,r-1,nums, memo);
-        memo[l][r] = Math.max(chooseLeft,chooseRight);
+        int chooseLeft = nums[l] - dfs(l + 1, r, nums, memo);
+        int chooseRight = nums[r] - dfs(l, r - 1, nums, memo);
+        memo[l][r] = Math.max(chooseLeft, chooseRight);
         return memo[l][r];
     }
 
