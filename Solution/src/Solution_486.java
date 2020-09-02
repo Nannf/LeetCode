@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 /**
  * @auth Nannf
  * @date 2020/9/1 18:42
@@ -35,16 +37,24 @@ public class Solution_486 {
             return true;
         }
         int length = nums.length;
-        return dfs(0, length - 1, nums) >= 0;
+        int[][] memo = new int[length][length];
+        for (int i = 0 ; i< length;i++) {
+            Arrays.fill(memo[i],Integer.MIN_VALUE);
+        }
+        return dfs(0, length - 1, nums,memo) >= 0;
     }
 
-    private int dfs(int l, int r, int[] nums) {
+    private int dfs(int l, int r, int[] nums, int[][] memo) {
         if (l > r) {
             return 0;
         }
-        int chooseLeft = nums[l] - dfs(l+1,r,nums);
-        int chooseRight = nums[r] - dfs(l,r-1,nums);
-        return Math.max(chooseLeft,chooseRight);
+        if (memo[l][r] != Integer.MIN_VALUE) {
+            return  memo[l][r];
+        }
+        int chooseLeft = nums[l] - dfs(l+1,r,nums, memo);
+        int chooseRight = nums[r] - dfs(l,r-1,nums, memo);
+        memo[l][r] = Math.max(chooseLeft,chooseRight);
+        return memo[l][r];
     }
 
 
