@@ -30,21 +30,22 @@
 public class Solution_486 {
 
     public boolean PredictTheWinner(int[] nums) {
-        int n = nums.length;
-        int sum  = 0;
-        for (int i = 0; i< n;i++) {
-            sum += nums[i];
+        // 偶数先拿一定赢
+        if (nums.length % 2 == 0) {
+            return true;
         }
-        int[][] optimal = new int[n-1][n-1];
-        // optimal[1][n-1]就是答案
-        for (int i = 0; i< n; i++) {
-            optimal[i][i] = nums[i];
-        }
-        for(int i = 0; i< n; i++) {
-
-        }
-
-        return false;
+        int length = nums.length;
+        return dfs(0, length - 1, nums) >= 0;
     }
+
+    private int dfs(int l, int r, int[] nums) {
+        if (l > r) {
+            return 0;
+        }
+        int chooseLeft = nums[l] - dfs(l+1,r,nums);
+        int chooseRight = nums[r] - dfs(l,r-1,nums);
+        return Math.max(chooseLeft,chooseRight);
+    }
+
 
 }
