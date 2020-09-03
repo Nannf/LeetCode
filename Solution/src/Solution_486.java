@@ -31,7 +31,44 @@ import java.util.Arrays;
  */
 public class Solution_486 {
 
-    public boolean PredictTheWinner(int[] nums) {
+    /**
+     * 动态规划解法
+     * 这个是典型的区间dp问题，就是在区间[1,n]求解最值问题
+     *
+     * @param nums
+     * @return
+     */
+    public boolean PredictTheWinner_dp(int[] nums) {
+        // 偶数先拿一定赢
+        if (nums.length % 2 == 0) {
+            return true;
+        }
+        int length = nums.length;
+        // 我们用 dp[i][j] 表示 [i,j] 上 先手拿的人 净胜后手的最大点数
+        // 最后 dp[1][length] 是否大于等于零，来判断是否会胜利
+        int[][] dp = new int[length][length];
+        // 如果左右区间相等，那么先手拿的人会净胜，
+        // 以此为基，推导出以后所有的值
+        // dp[i][j] = Math.max(nums[i] - dp[i+1][j], nums[j] - dp[i][j-1])
+        // 因为是个不断拆分的过程，所以最终所要求解的值是需要一步步推导上去的。
+        for (int i = 0; i < length; i++) {
+            dp[i][i] = nums[i];
+        }
+        // 这个怎么一步步推导上去呢，传统的双循环并不能解决问题
+        // 传统的双循环就是  i -> 0~n-1 j-> i+1,n-1
+
+        // 问题就是我们怎么利用那些已知的值慢慢扩大
+        for (int r = 1; r < length; r++) {
+            for (int l = r - 1; l >= 0; l--) {
+                for (int k = l; k < r; k++) {
+                    dp[k][r] = Math.max(nums[k] - dp[k + 1][r], nums[r] - dp[k][r - 1]);
+                }
+            }
+        }
+        return dp[0][length - 1] >= 0;
+    }
+
+    public boolean PredictTheWinner_dfs(int[] nums) {
         // 偶数先拿一定赢
         if (nums.length % 2 == 0) {
             return true;
