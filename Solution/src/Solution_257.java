@@ -41,24 +41,30 @@ public class Solution_257 {
         if (root == null) {
             return new ArrayList<>();
         }
+        // 这个用来保存最终的结果
         List<String> ans = new ArrayList<>();
+        // 这个用来存储回溯过程中的一些变量，当到达一定条件后，就会把这个路径变为最终答案的一部分
         List<Integer> trace = new ArrayList<>();
+        // 所有的路径都需要以根节点为开始
         trace.add(root.val);
+        // 开始回溯
         dfs(ans, trace, root);
         return ans;
     }
 
     private void dfs(List<String> ans, List<Integer> trace, TreeNode root) {
-        // 如果当前节点的左右子孩子全为空
+        // 如果当前节点的左右子孩子全为空，说明当前节点是叶子节点，这时候就到达了转换答案的条件
         if (root.left == null && root.right == null) {
             ans.add(build(trace));
             return;
         }
+        // 如果左孩子不为空，沿着左孩子一路扫下去
         if (root.left != null) {
             trace.add(root.left.val);
             dfs(ans,trace,root.left);
             trace.remove(trace.size()-1);
         }
+        // 如果右孩子不为空，一路扫下去
         if (root.right != null) {
             trace.add(root.right.val);
             dfs(ans,trace,root.right);
