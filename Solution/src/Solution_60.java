@@ -73,7 +73,11 @@ public class Solution_60 {
         // 比如有九个数，我要求第二十万个解答，因为选择一作为头之后，所有的可能只有8! = 40320 ，那么以1打头的我们无需递归，直接跳过
         // 类似的可以跳过前四个数打头的，直到以5打头的树才有后续的处理，这时候因为第五个也有8!个取法，我们要怎么过滤到只有一条呢？
         // 方法是类似的
+
+        // 这边一旦找到就是最后的答案，那些不满足条件的全部被前剪枝给过滤了
         if (trace.size() == n) {
+
+            // 这个参数是为了后剪枝
             isFind = true;
             ans.addAll(trace);
             return;
@@ -85,6 +89,9 @@ public class Solution_60 {
                 trace.add(i);
                 // 添加i之后 需要判断是否需要剪枝
                 if (factorial[n - trace.size()] < k) {
+                    // 随着跳过的数据，k的值也要减去那些跳过的数据
+                    // 最终的那个值的时候，k应该等于一
+                    // 这个就是疯狂剪枝
                     k = k - factorial[n - trace.size()];
                     trace.remove(trace.size() - 1);
                     continue;
