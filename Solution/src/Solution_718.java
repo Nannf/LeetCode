@@ -24,9 +24,30 @@ public class Solution_718 {
         System.out.println(new Solution_718().findLength(A, B));
     }
 
+    // 最短是0，最长是两个数组中长度最小的那个，确定上下边界，直接二分查找
+    public int findLength(int[] A, int[] B) {
+        int ans = 0;
+        int low = 0;
+        int high = Math.min(A.length, B.length);
+        while (low <= high) {
+            int mid = low + ((high - low) >> 1);
+            // 判断这个长度的
+            if (check(mid, A, B)) {
+
+            }
+        }
+
+        return ans;
+    }
+
+    private boolean check(int mid, int[] A, int[] B) {
+
+        return false;
+    }
+
 
     // 暴力解法有解吗，有解
-    public int findLength(int[] A, int[] B) {
+    public int findLength_bruce(int[] A, int[] B) {
         int ans = -1;
         for (int i = 0; i < A.length; i++) {
             // i的公共长度
