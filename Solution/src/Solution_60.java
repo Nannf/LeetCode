@@ -26,22 +26,34 @@ import java.util.List;
  * 输出: "2314"
  */
 public class Solution_60 {
-    boolean isFind = false;
-    int matchCount = 0;
 
     public static void main(String[] args) {
         System.out.println(new Solution_60().getPermutation(9, 101140));
     }
 
+    boolean isFind = false;
+
+
     //全排列问题
     // 超时
     public String getPermutation(int n, int k) {
-        long start = System.currentTimeMillis();
         List<Integer> ans = new ArrayList<>();
         List<Integer> trace = new ArrayList<>();
-        dfs(n, k, trace, ans);
-        System.out.println("cost " +  (System.currentTimeMillis() - start) +"");
+        int[] factorial = new int[n + 1];
+        factorial[0] = 1;
+        for (int i = 1; i <= n; i++) {
+            factorial[i] = countFactorial(i);
+        }
+        int cut = factorial[n];
+        dfs(n, k, trace, ans, factorial, cut);
         return build(ans);
+    }
+
+    private int countFactorial(int i) {
+        if (i == 1) {
+            return 1;
+        }
+        return i * countFactorial(i - 1);
     }
 
     private String build(List<Integer> trace) {
@@ -52,16 +64,18 @@ public class Solution_60 {
         return sb.toString();
     }
 
-    private void dfs(int n, int k, List<Integer> trace, List<Integer> ans) {
+    private void dfs(int n, int k, List<Integer> trace, List<Integer> ans, int[] factorial, int cut) {
         if (isFind) {
             return;
         }
+        // 这种剪枝的方式不够彻底，只剪了成功之后的，其实成功之前的也有很多可以被剪掉
+        // 成功之前剪掉的逻辑是，每个选择对应的子节点的个数是一定的，所有的选择个数也是一定的
+        // 比如有九个数，我要求第二十万个解答，因为选择一作为头之后，所有的可能只有8! = 40320 ，那么以1打头的我们无需递归，直接跳过
+        // 类似的可以跳过前四个数打头的，直到以5打头的树才有后续的处理，这时候因为第五个也有8!个取法，我们要怎么过滤到只有一条呢？
+        // 方法是类似的
         if (trace.size() == n) {
-            matchCount++;
-            if (matchCount == k) {
-                isFind = true;
-                ans.addAll(trace);
-            }
+            isFind = true;
+            ans.addAll(trace);
             return;
         }
 
@@ -69,7 +83,17 @@ public class Solution_60 {
         for (int i = 1; i <= n; i++) {
             if (!trace.contains(i)) {
                 trace.add(i);
-                dfs(n, k, trace, ans);
+                // 添加i之后 需要判断是否需要剪枝
+                if (factorial[n - trace.size()] < k) {
+                    k = k - factorial[n - trace.size()];
+                    trace.remove(trace.size() - 1);
+                    continue;
+                }
+                dfs(n, k, trace, ans, factorial, cut);
+                // 上一层dfs后，可能已经找到了，直接退出
+                if (isFind) {
+                    return;
+                }
                 trace.remove(trace.size() - 1);
             }
 
