@@ -24,7 +24,7 @@ public class Solution_718 {
         System.out.println(new Solution_718().findLength(A, B));
     }
 
-    // 最短是0，最长是两个数组中长度最小的那个，确定上下边界，直接二分查找
+    // 滑动窗口
     public int findLength(int[] A, int[] B) {
         int ans = 0;
         int low = 0;
@@ -33,16 +33,77 @@ public class Solution_718 {
             int mid = low + ((high - low) >> 1);
             // 判断这个长度的
             if (check(mid, A, B)) {
-
+                ans = mid;
+                low = mid + 1;
+            } else {
+                high = mid -1;
             }
         }
 
         return ans;
     }
 
-    private boolean check(int mid, int[] A, int[] B) {
 
+    // 最短是0，最长是两个数组中长度最小的那个，确定上下边界，直接二分查找
+    // 二分仍然超时
+    public int findLength_binary(int[] A, int[] B) {
+        int ans = 0;
+        int low = 0;
+        int high = Math.min(A.length, B.length);
+        while (low <= high) {
+            int mid = low + ((high - low) >> 1);
+            // 判断这个长度的
+            if (check(mid, A, B)) {
+                ans = mid;
+                low = mid + 1;
+            } else {
+                high = mid -1;
+            }
+        }
+
+        return ans;
+    }
+
+    // 用滑动窗口进行判断
+    private boolean check(int mid, int[] A, int[] B) {
+        int i = 0;
+        int j = i + mid -1;
+        int minSize = Math.min(A.length, B.length);
+
+        while (j < minSize) {
+            int[] tmp = new int[mid];
+            System.arraycopy(A, i, tmp, 0, mid);
+            if (judge(mid, tmp, B)) {
+                return true;
+            }
+            i++;
+            j++;
+        }
         return false;
+    }
+
+    private boolean judge(int mid, int[] dest, int[] b) {
+        int i = 0;
+        int j = i+mid-1;
+        while (j < b.length) {
+            int[] tmp = new int[mid];
+            System.arraycopy(b, i, tmp, 0, mid);
+            if (judgeTwoArray(dest,tmp)) {
+                return true;
+            }
+            i++;
+            j++;
+        }
+        return false;
+    }
+
+    private boolean judgeTwoArray(int[] dest, int[] b) {
+        for (int i = 0; i<b.length;i++) {
+            if (dest[i] != b[i] ) {
+                return false;
+            }
+        }
+        return true;
     }
 
 
