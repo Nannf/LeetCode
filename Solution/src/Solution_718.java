@@ -26,20 +26,50 @@ public class Solution_718 {
 
     // 滑动窗口
     public int findLength(int[] A, int[] B) {
+        // 滑动窗口的解法，有一个基础的集合，有一个滑动的集合，我们暂定A为滑动的集合
+        // 滑动窗口要以小的那个味滑动集合，之所以这样是因为当达到窗口最大值的时候，如果要接着往后滑，你就要判断当前的滑动集合的长度和滑动窗口集合的长度的大小关系
+        // 我们在一开始就判定好以小的集合为滑动窗口
+        // 滑动的总次数是 A.length+B.length -1;
+        return A.length > B.length ? slidingWindow(B, A) : slidingWindow(A, B);
+
+    }
+
+    /**
+     * b是滑动的那个窗口
+     * 滑动窗口其实分为了三段，一个是进入的时候，一个是完全进入尚未出去的时候，一个是开始出去，直到结束的时候
+     * @param b
+     * @param a
+     * @return
+     */
+    private int slidingWindow(int[] b, int[] a) {
         int ans = 0;
-        int low = 0;
-        int high = Math.min(A.length, B.length);
-        while (low <= high) {
-            int mid = low + ((high - low) >> 1);
-            // 判断这个长度的
-            if (check(mid, A, B)) {
-                ans = mid;
-                low = mid + 1;
+        // 窗口的最大值是两个数组长度的最小值
+        int maxWindowSize = Math.min(a.length, b.length);
+        int currentWindowSize = 1;
+        // 一共的滑动次数是确定的
+        for (int i = 1; i <= a.length + b.length - 1; i++) {
+            if (currentWindowSize <= maxWindowSize) {
+                ans = Math.max(ans, findMax(b, b.length - currentWindowSize, a, 0, currentWindowSize));
+                currentWindowSize++;
             } else {
-                high = mid -1;
+                ans = Math.max(ans, findMax(b, 0, a, 0, currentWindowSize));
+            }
+
+        }
+        return ans;
+    }
+
+    private int findMax(int[] b, int bstart, int[] a, int astart, int currentWindowSize) {
+        int ans = 0;
+        int k = 0;
+        for (int i = 0; i < currentWindowSize; i++) {
+            if (b[bstart + i] == a[astart + i]) {
+                k++;
+            } else {
+                ans = Math.max(ans, k);
+                k = 0;
             }
         }
-
         return ans;
     }
 
@@ -57,7 +87,7 @@ public class Solution_718 {
                 ans = mid;
                 low = mid + 1;
             } else {
-                high = mid -1;
+                high = mid - 1;
             }
         }
 
@@ -67,7 +97,7 @@ public class Solution_718 {
     // 用滑动窗口进行判断
     private boolean check(int mid, int[] A, int[] B) {
         int i = 0;
-        int j = i + mid -1;
+        int j = i + mid - 1;
         int minSize = Math.min(A.length, B.length);
 
         while (j < minSize) {
@@ -84,11 +114,11 @@ public class Solution_718 {
 
     private boolean judge(int mid, int[] dest, int[] b) {
         int i = 0;
-        int j = i+mid-1;
+        int j = i + mid - 1;
         while (j < b.length) {
             int[] tmp = new int[mid];
             System.arraycopy(b, i, tmp, 0, mid);
-            if (judgeTwoArray(dest,tmp)) {
+            if (judgeTwoArray(dest, tmp)) {
                 return true;
             }
             i++;
@@ -98,8 +128,8 @@ public class Solution_718 {
     }
 
     private boolean judgeTwoArray(int[] dest, int[] b) {
-        for (int i = 0; i<b.length;i++) {
-            if (dest[i] != b[i] ) {
+        for (int i = 0; i < b.length; i++) {
+            if (dest[i] != b[i]) {
                 return false;
             }
         }
