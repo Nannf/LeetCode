@@ -37,6 +37,8 @@ public class Solution_718 {
     /**
      * b是滑动的那个窗口
      * 滑动窗口其实分为了三段，一个是进入的时候，一个是完全进入尚未出去的时候，一个是开始出去，直到结束的时候
+     * 窗口的大小变化趋势类似于 1,2,3,4,5....maxWindowSize,maxWindowSize......5.4.3.2.1
+     *
      * @param b
      * @param a
      * @return
@@ -45,16 +47,23 @@ public class Solution_718 {
         int ans = 0;
         // 窗口的最大值是两个数组长度的最小值
         int maxWindowSize = Math.min(a.length, b.length);
-        int currentWindowSize = 1;
         // 一共的滑动次数是确定的
-        for (int i = 1; i <= a.length + b.length - 1; i++) {
-            if (currentWindowSize <= maxWindowSize) {
-                ans = Math.max(ans, findMax(b, b.length - currentWindowSize, a, 0, currentWindowSize));
-                currentWindowSize++;
-            } else {
-                ans = Math.max(ans, findMax(b, 0, a, 0, currentWindowSize));
+        for (int i = 1; i <= maxWindowSize; i++) {
+            ans = Math.max(ans, findMax(b, b.length - i, a, 0, i));
+            if (ans == maxWindowSize) {
+                return ans;
             }
+        }
+        int j = 1;
+        for (int i = a.length - maxWindowSize; i > 0; i--) {
+            ans = Math.max(ans, findMax(b, 0, a, j++, maxWindowSize));
+            if (ans == maxWindowSize) {
+                return ans;
+            }
+        }
 
+        for (int i = maxWindowSize - 1; i >= 1; i--) {
+            ans = Math.max(ans,findMax(b,0,a,j++,i));
         }
         return ans;
     }
@@ -66,9 +75,9 @@ public class Solution_718 {
             if (b[bstart + i] == a[astart + i]) {
                 k++;
             } else {
-                ans = Math.max(ans, k);
                 k = 0;
             }
+            ans = Math.max(ans, k);
         }
         return ans;
     }
