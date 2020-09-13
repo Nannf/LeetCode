@@ -47,7 +47,6 @@ public class Solution_1423 {
     public static void main(String[] args) {
         int[] cardPoints = new int[]{1, 79, 80, 1, 1, 1, 200, 1};
         System.out.println(new Solution_1423().maxScore(cardPoints, 3));
-
     }
 
     // 滑动窗口
