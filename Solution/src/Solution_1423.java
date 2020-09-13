@@ -45,40 +45,72 @@ import java.util.List;
 public class Solution_1423 {
 
     public static void main(String[] args) {
-        int[] cardPoints = new int[] {1,79,80,1,1,1,200,1};
-        System.out.println(new Solution_1423().maxScore(cardPoints,3));
+        int[] cardPoints = new int[]{1, 79, 80, 1, 1, 1, 200, 1};
+        System.out.println(new Solution_1423().maxScore(cardPoints, 3));
+
     }
 
+    // 滑动窗口
+    // 之前没有想到 这个求
+    public int maxScore(int[] cardPoints, int k) {
+        int ans = 0;
+        int n = cardPoints.length;
+        int[] sum = new int[n + 1];
+        sum[0] = 0;
+        for (int i = 0; i < n; i++) {
+            sum[i + 1] = sum[i] + cardPoints[i];
+        }
 
+        for (int i = 0; i <= k; i++) {
+            ans = Math.max(sum[i] + sum[n] - sum[n - k + i], ans);
+        }
+        return ans;
+
+    }
+
+    // 因为这个限定了只能从队首或者队尾取所以 如果要取k个数的话  可以做如下的排列
+    //  队首取的数量  队尾取的数量
+    //  0              k
+    //  1              k-1
+    // ...             ...
+    //  k              0
+    public int maxScore_dp(int[] cardPoints, int k) {
+        int ans = 0;
+        int n = cardPoints.length;
+        int[] sum = new int[n + 1];
+        sum[0] = 0;
+        for (int i = 0; i < n; i++) {
+            sum[i + 1] = sum[i] + cardPoints[i];
+        }
+
+        for (int i = 0; i <= k; i++) {
+            ans = Math.max(sum[i] + sum[n] - sum[n - k + i], ans);
+        }
+        return ans;
+
+    }
 
     // 用回溯有解,但是超时
-    public int maxScore(int[] cardPoints, int k) {
+    public int maxScore_backtrace(int[] cardPoints, int k) {
         List<Integer> trace = new ArrayList<>();
         List<Integer> ans = new ArrayList<>();
-        int[][] memo = new int[cardPoints.length ][cardPoints.length];
-        for (int i = 0; i< memo.length;i++) {
-            Arrays.fill(memo[0],0);
-        }
-        backtrace(ans, trace, k, cardPoints, 0, cardPoints.length - 1,memo);
+        backtrace(ans, trace, k, cardPoints, 0, cardPoints.length - 1);
 
         Collections.sort(ans);
         return ans.get(ans.size() - 1);
     }
 
-    private void backtrace(List<Integer> ans, List<Integer> trace, int k, int[] cardPoints, int start, int end, int[][] memo) {
+    private void backtrace(List<Integer> ans, List<Integer> trace, int k, int[] cardPoints, int start, int end) {
         if (trace.size() == k) {
             ans.add(sumList(trace, cardPoints));
             return;
         }
-        if (memo[start][end] != 0) {
-            return;
-        }
         trace.add(start);
-        backtrace(ans,trace,k,cardPoints,start+1,end, memo);
-        trace.remove(trace.size() -1);
+        backtrace(ans, trace, k, cardPoints, start + 1, end);
+        trace.remove(trace.size() - 1);
         trace.add(end);
-        backtrace(ans,trace,k,cardPoints,start,end-1, memo);
-        trace.remove(trace.size() -1);
+        backtrace(ans, trace, k, cardPoints, start, end - 1);
+        trace.remove(trace.size() - 1);
     }
 
     private Integer sumList(List<Integer> trace, int[] cardPoints) {
