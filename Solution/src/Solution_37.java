@@ -1,0 +1,212 @@
+import com.sun.glass.ui.Size;
+
+import java.util.*;
+
+/**
+ * @auth Nannf
+ * @date 2020/9/15 17:39
+ * @description: 编写一个程序，通过已填充的空格来解决数独问题。
+ * <p>
+ * 一个数独的解法需遵循如下规则：
+ * <p>
+ * 数字 1-9 在每一行只能出现一次。
+ * 数字 1-9 在每一列只能出现一次。
+ * 数字 1-9 在每一个以粗实线分隔的 3x3 宫内只能出现一次。
+ * 空白格用 '.' 表示。
+ * <p>
+ * 给定的数独序列只包含数字 1-9 和字符 '.' 。
+ * 你可以假设给定的数独只有唯一解。
+ * 给定数独永远是 9x9 形式的。
+ */
+public class Solution_37 {
+
+    public static void main(String[] args) {
+        char[][] board = {{'5', '3', '.', '.', '7', '.', '.', '.', '.'}, {'6', '.', '.', '1', '9', '5', '.', '.', '.'}, {'.', '9', '8', '.', '.', '.', '.', '6', '.'}, {'8', '.', '.', '.', '6', '.', '.', '.', '3'}, {'4', '.', '.', '8', '.', '3', '.', '.', '1'}, {'7', '.', '.', '.', '2', '.', '.', '.', '6'}, {'.', '6', '.', '.', '.', '.', '2', '8', '.'}, {'.', '.', '.', '4', '1', '9', '.', '.', '5'}, {'.', '.', '.', '.', '8', '.', '.', '7', '9'}};
+        new Solution_37().solveSudoku(board);
+    }
+
+    // 题目的意思是给定的9*9
+    private static final int SIZE = 9;
+
+    private static final Map<Integer, List<Point>> NINE_INFO = new HashMap<>();
+
+    static {
+        int count = 0;
+        for (int i = 0; i <= 2; i++) {
+            for (int j = 0; j <= 2; j++) {
+                List<Point> points = new ArrayList<>();
+                int iStart = i * 3;
+                int iEnd = i * 3 + 2;
+                int jStart = j * 3;
+                int jEnd = j * 3 + 2;
+
+                for (int m = iStart; m <= iEnd; m++) {
+                    for (int n = jStart; n <= jEnd; n++) {
+                        Point point = new Point(m, n);
+                        points.add(point);
+                    }
+                }
+                NINE_INFO.put(count++, points);
+            }
+
+        }
+    }
+
+    public void solveSudoku(char[][] board) {
+        PlaceMap map = new PlaceMap();
+        backtrace(map, board, 0, 0);
+        backfill(map, board);
+    }
+
+    private void backfill(PlaceMap map, char[][] board) {
+        for (Map.Entry<Point, Integer> entry : map.placeInfo.entrySet()) {
+            Point point = entry.getKey();
+            board[point.x][point.y] = String.valueOf(entry.getValue()).charAt(0);
+        }
+    }
+
+    private void backtrace(PlaceMap map, char[][] board, int i, int j) {
+        // 如果超过了处理的边界，直接退出
+        if (i >= SIZE || j >= SIZE) {
+            return;
+        }
+
+        // 如果是数字
+        while (Character.isDigit(board[i][j])) {
+            j = j + 1;
+            if (j == SIZE) {
+                j = 0;
+                i++;
+            }
+        }
+        // 这是所有的可能数值
+        for (int m = 1; m <= SIZE; m++) {
+            // 判断是否合适
+            if (isLegal(m, board, j, j, map)) {
+                // 如果合适的话 就添加上去
+                map.add(i, j, m);
+                backtrace(map, board, i, j);
+                map.remove(i, j);
+            }
+        }
+
+
+    }
+
+    private boolean isLegal(int m, char[][] board, int i, int j, PlaceMap map) {
+
+        // 先判断同行有没有
+        for (int k = 0; k < SIZE; k++) {
+            if (Character.isDigit(board[i][k])) {
+                if (m == Integer.parseInt(String.valueOf(board[i][k]))) {
+                    return false;
+                }
+            }
+            if (map.containsKey(i, k) && map.get(i, k) == m) {
+                return false;
+            }
+        }
+
+        // 再判断同列有没有
+        for (int k = 0; k < SIZE; k++) {
+            if (Character.isDigit(board[k][j])) {
+                if (m == Integer.parseInt(String.valueOf(board[k][j]))) {
+                    return false;
+                }
+            }
+            if (map.containsKey(k, j) && map.get(k, j) == m) {
+                return false;
+            }
+        }
+
+        // 再判断九宫格有没有
+        // 先拿九宫格的key
+        int nineKey = i / 3 + j / 3;
+        List<Point> points = NINE_INFO.get(nineKey);
+
+        for (Point point : points) {
+            if (Character.isDigit(board[point.x][point.y])) {
+                if (m == Integer.parseInt(String.valueOf(board[point.x][point.y]))) {
+                    return false;
+                }
+            }
+
+            if (map.containsKey(point.x, point.y) && map.get(point.x, point.y) == m) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    public class PlaceMap {
+        private Map<Point, Integer> placeInfo = new HashMap<>();
+
+
+        public boolean containsKey(int x, int y) {
+            for (Map.Entry<Point, Integer> entry : placeInfo.entrySet()) {
+                if (entry.getKey().x == x && entry.getKey().y == y) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public void add(int x, int y, int value) {
+            if (containsKey(x, y)) {
+                remove(x, y);
+            }
+            Point point = new Point(x, y);
+            placeInfo.put(point, value);
+        }
+
+        public void remove(int x, int y) {
+            for (Map.Entry<Point, Integer> entry : placeInfo.entrySet()) {
+                if (entry.getKey().x == x && entry.getKey().y == y) {
+                    placeInfo.remove(entry.getKey());
+                    return;
+                }
+            }
+        }
+
+        public int get(int x, int y) {
+            for (Map.Entry<Point, Integer> entry : placeInfo.entrySet()) {
+                if (entry.getKey().x == x && entry.getKey().y == y) {
+                    return entry.getValue();
+                }
+            }
+            System.out.println("非法");
+            return -1;
+        }
+
+    }
+
+    public static class Point {
+        private int x;
+        private int y;
+
+        public Point() {
+        }
+
+        public Point(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public int getX() {
+            return x;
+        }
+
+        public void setX(int x) {
+            this.x = x;
+        }
+
+        public int getY() {
+            return y;
+        }
+
+        public void setY(int y) {
+            this.y = y;
+        }
+    }
+}
