@@ -1,4 +1,3 @@
-import com.sun.glass.ui.Size;
 
 import java.util.*;
 
@@ -21,12 +20,26 @@ import java.util.*;
 public class Solution_37 {
 
     public static void main(String[] args) {
-        char[][] board = {{'5', '3', '.', '.', '7', '.', '.', '.', '.'}, {'6', '.', '.', '1', '9', '5', '.', '.', '.'}, {'.', '9', '8', '.', '.', '.', '.', '6', '.'}, {'8', '.', '.', '.', '6', '.', '.', '.', '3'}, {'4', '.', '.', '8', '.', '3', '.', '.', '1'}, {'7', '.', '.', '.', '2', '.', '.', '.', '6'}, {'.', '6', '.', '.', '.', '.', '2', '8', '.'}, {'.', '.', '.', '4', '1', '9', '.', '.', '5'}, {'.', '.', '.', '.', '8', '.', '.', '7', '9'}};
+        char[][] board = {
+                {'5', '3', '.', '.', '7', '.', '.', '.', '.'},
+                {'6', '.', '.', '1', '9', '5', '.', '.', '.'},
+                {'.', '9', '8', '.', '.', '.', '.', '6', '.'},
+                {'8', '.', '.', '.', '6', '.', '.', '.', '3'},
+                {'4', '.', '.', '8', '.', '3', '.', '.', '1'},
+                {'7', '.', '.', '.', '2', '.', '.', '.', '6'},
+                {'.', '6', '.', '.', '.', '.', '2', '8', '.'},
+                {'.', '.', '.', '4', '1', '9', '.', '.', '5'},
+                {'.', '.', '.', '.', '8', '.', '.', '7', '9'}};
         new Solution_37().solveSudoku(board);
+        for (char[] chars : board) {
+            System.out.println(new String(chars));
+        }
     }
 
     // 题目的意思是给定的9*9
     private static final int SIZE = 9;
+
+    static boolean findFlag = false;
 
     private static final Map<Integer, List<Point>> NINE_INFO = new HashMap<>();
 
@@ -56,6 +69,7 @@ public class Solution_37 {
         PlaceMap map = new PlaceMap();
         backtrace(map, board, 0, 0);
         backfill(map, board);
+
     }
 
     private void backfill(PlaceMap map, char[][] board) {
@@ -65,29 +79,65 @@ public class Solution_37 {
         }
     }
 
-    private void backtrace(PlaceMap map, char[][] board, int i, int j) {
+    private void backtrace(PlaceMap map, char[][] board, int x, int y) {
         // 如果超过了处理的边界，直接退出
-        if (i >= SIZE || j >= SIZE) {
+        if (x >= SIZE || findFlag) {
+            findFlag = true;
             return;
         }
 
-        // 如果是数字
-        while (Character.isDigit(board[i][j])) {
-            j = j + 1;
-            if (j == SIZE) {
-                j = 0;
-                i++;
+        // 从每一个格子开始找起
+        for (; y < SIZE; y++) {
+            // 如果是数字，就会一直顺延
+            while (Character.isDigit(board[x][y]) || map.containsKey(x, y)) {
+                y++;
+                if (y == SIZE) {
+                    y = 0;
+                    x++;
+                    if (x >= SIZE) {
+                        findFlag = true;
+                        return;
+                    }
+                }
             }
-        }
-        // 这是所有的可能数值
-        for (int m = 1; m <= SIZE; m++) {
-            // 判断是否合适
-            if (isLegal(m, board, j, j, map)) {
-                // 如果合适的话 就添加上去
-                map.add(i, j, m);
-                backtrace(map, board, i, j);
-                map.remove(i, j);
+            boolean flag = false;
+            // 直到找到第一个不是数字的位置
+            // 这是所有的可能数值
+            for (int m = 1; m <= SIZE; m++) {
+                // 判断是否合适
+                if (isLegal(m, board, x, y, map)) {
+                    flag = true;
+                    int x1 = x;
+                    int y1 = y;
+                    // 如果合适的话 就添加上去
+                    map.add(x, y, m);
+                    // 添加上去之后 就找下一个格子
+                    y++;
+                    if (y == SIZE) {
+                        y = 0;
+                        x++;
+                        if (x >= SIZE) {
+                            findFlag = true;
+                            return;
+                        }
+                    }
+                    // 拿下一级的作为参数进行回溯
+                    backtrace(map, board, x, y);
+
+                    if (findFlag) {
+                        return;
+                    }
+                    // 回溯失败之后 需要把本次做的决定撤销
+                    map.remove(x1, y1);
+                    flag =false;
+                    y = y1;
+                    x = x1;
+                }
             }
+            if (!flag) {
+                return;
+            }
+
         }
 
 
@@ -121,7 +171,7 @@ public class Solution_37 {
 
         // 再判断九宫格有没有
         // 先拿九宫格的key
-        int nineKey = i / 3 + j / 3;
+        int nineKey = (i / 3) * 3 + j / 3;
         List<Point> points = NINE_INFO.get(nineKey);
 
         for (Point point : points) {
