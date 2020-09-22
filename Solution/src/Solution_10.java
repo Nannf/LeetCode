@@ -48,13 +48,14 @@
  * 输出: false
  */
 public class Solution_10 {
-    boolean find = false;
-
     public static void main(String[] args) {
-        if (new Solution_10().isMatch("aa", "a*")) {
+        if (new Solution_10().isMatch("mississippi", "mis*is*p*.")) {
             System.out.println("bingo!");
         }
     }
+    boolean find = false;
+
+
 
     public boolean isMatch(String s, String p) {
         int sLen = s.length();
@@ -94,8 +95,20 @@ public class Solution_10 {
             // 直接往下比
             backtrace(s, sIndex + 1, sLen, p, pIndex + 1, pLen);
         } else if (p.charAt(pIndex) == '*') {
-            for (int k = 0; k < sLen - sIndex; k++) {
-                backtrace(s, sIndex + k - 1, sLen, p, pIndex + 1, pLen);
+            char preChar = p.charAt(pIndex - 1);
+
+            for (int k = 0; k <= sLen - sIndex; k++) {
+                if (find) {
+                    return;
+                }
+                // 这边根据这个k 来获取新的字符串的值
+                if (k == 0) {
+                    backtrace(s, sIndex , sLen, p, pIndex + 1, pLen);
+                } else {
+                    String newString = buildNewString(p, pIndex, k, preChar);
+                    backtrace(s, sIndex + k - 1, sLen, newString, pIndex, newString.length());
+                }
+
             }
 
         } else {
@@ -109,5 +122,19 @@ public class Solution_10 {
                 }
             }
         }
+    }
+
+    private String buildNewString(String p, int pIndex, int k, char preChar) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < p.length(); i++) {
+            if (i == pIndex) {
+                for (int j = 0; j < k; j++) {
+                    sb.append(preChar);
+                }
+            } else {
+                sb.append(p.charAt(i));
+            }
+        }
+        return sb.toString();
     }
 }
