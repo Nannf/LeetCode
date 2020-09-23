@@ -49,7 +49,7 @@
  */
 public class Solution_10 {
     public static void main(String[] args) {
-        if (new Solution_10().isMatch("mississippi", "mis*is*p*.")) {
+        if (new Solution_10().isMatch("ab", ".*c")) {
             System.out.println("bingo!");
         }
     }
@@ -82,9 +82,10 @@ public class Solution_10 {
         if (find) {
             return;
         }
+
         // 如果模式串和待匹配字符串都到了结尾
         if (pIndex >= pLen) {
-            if (sLen >= sIndex) {
+            if (sLen <= sIndex) {
                 find = true;
             }
             return;
@@ -116,6 +117,9 @@ public class Solution_10 {
             }
         }
 
+        if (sIndex >= sLen) {
+            return;
+        }
         if (p.charAt(pIndex) == s.charAt(sIndex) || p.charAt(pIndex) == '.') {
             backtrace(s, sIndex + 1, sLen, p, pIndex + 1, pLen);
         }
