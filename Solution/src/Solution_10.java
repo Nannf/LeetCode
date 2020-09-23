@@ -53,8 +53,8 @@ public class Solution_10 {
             System.out.println("bingo!");
         }
     }
-    boolean find = false;
 
+    boolean find = false;
 
 
     public boolean isMatch(String s, String p) {
@@ -83,58 +83,42 @@ public class Solution_10 {
             return;
         }
         // 如果模式串和待匹配字符串都到了结尾
-        if (pIndex == pLen) {
-            if (sLen == sIndex) {
+        if (pIndex >= pLen) {
+            if (sLen >= sIndex) {
                 find = true;
             }
             return;
         }
+        //如果当前匹配的元素的下一个是* 分成几种情况
+        if (pIndex + 1 < pLen && p.charAt(pIndex + 1) == '*') {
+            if (sIndex >= sLen) {
+                backtrace(s, sIndex, sLen, p, pIndex + 2, pLen);
+            } else {
+                // 当当前的匹配的时候
+                if (p.charAt(pIndex) == s.charAt(sIndex) || p.charAt(pIndex) == '.') {
+                    // 这里的*表示只出现了一次
+                    backtrace(s, sIndex + 1, sLen, p, pIndex + 2, pLen);
+                    if (find) {
+                        return;
+                    }
+                    // 这里的pIndex 不变，表示*出现了任意次
+                    backtrace(s, sIndex + 1, sLen, p, pIndex, pLen);
 
-        // 如果是点直接通过
-        if (p.charAt(pIndex) == '.') {
-            // 直接往下比
-            backtrace(s, sIndex + 1, sLen, p, pIndex + 1, pLen);
-        } else if (p.charAt(pIndex) == '*') {
-            char preChar = p.charAt(pIndex - 1);
-
-            for (int k = 0; k <= sLen - sIndex; k++) {
-                if (find) {
-                    return;
-                }
-                // 这边根据这个k 来获取新的字符串的值
-                if (k == 0) {
-                    backtrace(s, sIndex , sLen, p, pIndex + 1, pLen);
+                    if (find) {
+                        return;
+                    }
+                    backtrace(s, sIndex, sLen, p, pIndex + 2, pLen);
                 } else {
-                    String newString = buildNewString(p, pIndex, k, preChar);
-                    backtrace(s, sIndex + k - 1, sLen, newString, pIndex, newString.length());
-                }
-
-            }
-
-        } else {
-            if (p.charAt(pIndex) == s.charAt(sIndex)) {
-                // 直接往下比
-                backtrace(s, sIndex + 1, sLen, p, pIndex + 1, pLen);
-            } else {
-                // 这个如果不相同，不能直接返回，因为后面如果有*的话，这个不相等的是可以被处理的
-                if (pIndex != pLen - 1 && p.charAt(pIndex + 1) == '*') {
-                    backtrace(s, sIndex, sLen, p, pIndex + 1, pLen);
+                    // 当*代表0的时候
+                    // 匹配串不动，模式串往后移动两位，跳过*
+                    backtrace(s, sIndex, sLen, p, pIndex + 2, pLen);
                 }
             }
         }
+
+        if (p.charAt(pIndex) == s.charAt(sIndex) || p.charAt(pIndex) == '.') {
+            backtrace(s, sIndex + 1, sLen, p, pIndex + 1, pLen);
+        }
     }
 
-    private String buildNewString(String p, int pIndex, int k, char preChar) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < p.length(); i++) {
-            if (i == pIndex) {
-                for (int j = 0; j < k; j++) {
-                    sb.append(preChar);
-                }
-            } else {
-                sb.append(p.charAt(i));
-            }
-        }
-        return sb.toString();
-    }
 }
