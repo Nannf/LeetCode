@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -133,17 +134,23 @@ public class Solution_10 {
         if (p.startsWith("*")) {
             return false;
         }
-
-        backtrace(s.toCharArray(), 0, sLen, p.toCharArray(), 0, pLen);
+        int[][] memo = new int[sLen +1][pLen+1];
+        for (int i = 0; i < s.length(); i++) {
+            Arrays.fill(memo[i], 0);
+        }
+        backtrace(s.toCharArray(), 0, sLen, p.toCharArray(), 0, pLen,memo);
 
         return find;
     }
 
-    private void backtrace(char[] s, int sIndex, int sLen, char[] p, int pIndex, int pLen) {
+    private void backtrace(char[] s, int sIndex, int sLen, char[] p, int pIndex, int pLen, int[][] memo) {
         if (find) {
             return;
         }
-
+        if (memo[sIndex][pIndex] != 0) {
+            return;
+        }
+        memo[sIndex][pIndex] = 1;
         // 如果模式串和待匹配字符串都到了结尾
         // 这边之所以不加sLen的判断，是因为会出现sIndex 已经到结尾，但是pIndex没到结尾，仍然会匹配的情况
         if (pIndex >= pLen) {
@@ -158,26 +165,26 @@ public class Solution_10 {
             // 假设匹配串是 aa,模式串是 aab*c*d*
             // 这样仍然是可以匹配的，因为匹配串已经到结尾，所以这种情况，直接跳过*即可
             if (sIndex >= sLen) {
-                backtrace(s, sIndex, sLen, p, pIndex + 2, pLen);
+                backtrace(s, sIndex, sLen, p, pIndex + 2, pLen ,memo);
             } else {
                 // 当当前的匹配的时候
                 if (p[pIndex] == s[sIndex] || p[pIndex] == '.') {
                     // 这里的*表示只出现了一次
-                    backtrace(s, sIndex + 1, sLen, p, pIndex + 2, pLen);
+                    backtrace(s, sIndex + 1, sLen, p, pIndex + 2, pLen,memo);
                     if (find) {
                         return;
                     }
                     // 这里的pIndex 不变，表示*出现了任意次
-                    backtrace(s, sIndex + 1, sLen, p, pIndex, pLen);
+                    backtrace(s, sIndex + 1, sLen, p, pIndex, pLen,memo);
 
                     if (find) {
                         return;
                     }
-                    backtrace(s, sIndex, sLen, p, pIndex + 2, pLen);
+                    backtrace(s, sIndex, sLen, p, pIndex + 2, pLen,memo);
                 } else {
                     // 当*代表0的时候
                     // 匹配串不动，模式串往后移动两位，跳过*
-                    backtrace(s, sIndex, sLen, p, pIndex + 2, pLen);
+                    backtrace(s, sIndex, sLen, p, pIndex + 2, pLen,memo);
                 }
             }
         } else {
@@ -187,7 +194,7 @@ public class Solution_10 {
                 return;
             }
             if (p[pIndex] == s[sIndex] || p[pIndex] == '.') {
-                backtrace(s, sIndex + 1, sLen, p, pIndex + 1, pLen);
+                backtrace(s, sIndex + 1, sLen, p, pIndex + 1, pLen,memo);
             }
         }
     }
