@@ -147,6 +147,7 @@ public class Solution_10 {
         if (find) {
             return;
         }
+        // 如果存在，说明这种索引情况已经被计算过，无需在被计算
         if (memo[sIndex][pIndex] != 0) {
             return;
         }
