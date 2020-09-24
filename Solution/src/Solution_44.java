@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 /**
  * @auth Nannf
  * @date 2020/9/24 16:55
@@ -45,7 +47,7 @@
 public class Solution_44 {
 
     public static void main(String[] args) {
-        if (new Solution_44().isMatch("aa","*")) {
+        if (new Solution_44().isMatch("aa", "*")) {
             System.out.println("bingo");
         }
     }
@@ -56,15 +58,23 @@ public class Solution_44 {
         if (p.length() == 0) {
             return s.length() == 0;
         }
-        backtrace(s.toCharArray(), 0, p.toCharArray(), 0);
+        int[][] memo = new int[s.length() + 1][p.length() + 1];
+        for (int i = 0; i < s.length(); i++) {
+            Arrays.fill(memo[i], 0);
+        }
+        backtrace(s.toCharArray(), 0, p.toCharArray(), 0, memo);
 
         return find;
     }
 
-    private void backtrace(char[] s, int sIndex, char[] p, int pIndex) {
+    private void backtrace(char[] s, int sIndex, char[] p, int pIndex, int[][] memo) {
         if (find) {
             return;
         }
+        if (memo[sIndex][pIndex] != 0) {
+            return;
+        }
+        memo[sIndex][pIndex] = 1;
         int sLen = s.length;
         int pLen = p.length;
         if (pIndex >= pLen) {
@@ -76,10 +86,10 @@ public class Solution_44 {
 
         if (p[pIndex] == '*') {
             if (sIndex >= sLen) {
-                backtrace(s, sIndex, p, pIndex + 1);
+                backtrace(s, sIndex, p, pIndex + 1, memo);
             } else {
                 // *代表空
-                backtrace(s, sIndex, p, pIndex + 1);
+                backtrace(s, sIndex, p, pIndex + 1, memo);
                 if (find) {
                     return;
                 }
@@ -87,16 +97,16 @@ public class Solution_44 {
                     if (find) {
                         return;
                     }
-                    backtrace(s,sIndex+k,p,pIndex);
+                    backtrace(s, sIndex + k, p, pIndex, memo);
                 }
             }
+        } else {
+            if (sIndex >= sLen) {
+                return;
+            }
+            if (p[pIndex] == s[sIndex] || p[pIndex] == '?') {
+                backtrace(s, sIndex + 1, p, pIndex + 1, memo);
+            }
         }
-        if (sIndex >= sLen) {
-            return;
-        }
-        if (p[pIndex] == s[sIndex] || p[pIndex] == '?') {
-            backtrace(s,sIndex+1,p,pIndex+1);
-        }
-
     }
 }
