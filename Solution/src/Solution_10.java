@@ -73,12 +73,12 @@ public class Solution_10 {
             return false;
         }
 
-        backtrace(s, 0, sLen, p, 0, pLen);
+        backtrace(s.toCharArray(), 0, sLen, p.toCharArray(), 0, pLen);
 
         return find;
     }
 
-    private void backtrace(String s, int sIndex, int sLen, String p, int pIndex, int pLen) {
+    private void backtrace(char[] s, int sIndex, int sLen, char[] p, int pIndex, int pLen) {
         if (find) {
             return;
         }
@@ -92,7 +92,7 @@ public class Solution_10 {
             return;
         }
         //如果当前匹配的元素的下一个是* 分成几种情况
-        if (pIndex + 1 < pLen && p.charAt(pIndex + 1) == '*') {
+        if (pIndex + 1 < pLen && p[pIndex + 1] == '*') {
             // 这种情况出现的原因是在于*可以表示0个
             // 假设匹配串是 aa,模式串是 aab*c*d*
             // 这样仍然是可以匹配的，因为匹配串已经到结尾，所以这种情况，直接跳过*即可
@@ -100,7 +100,7 @@ public class Solution_10 {
                 backtrace(s, sIndex, sLen, p, pIndex + 2, pLen);
             } else {
                 // 当当前的匹配的时候
-                if (p.charAt(pIndex) == s.charAt(sIndex) || p.charAt(pIndex) == '.') {
+                if (p[pIndex] == s[sIndex] || p[pIndex] == '.') {
                     // 这里的*表示只出现了一次
                     backtrace(s, sIndex + 1, sLen, p, pIndex + 2, pLen);
                     if (find) {
@@ -125,7 +125,7 @@ public class Solution_10 {
             if (sIndex >= sLen) {
                 return;
             }
-            if (p.charAt(pIndex) == s.charAt(sIndex) || p.charAt(pIndex) == '.') {
+            if (p[pIndex] == s[sIndex] || p[pIndex] == '.') {
                 backtrace(s, sIndex + 1, sLen, p, pIndex + 1, pLen);
             }
         }
