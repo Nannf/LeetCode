@@ -84,6 +84,7 @@ public class Solution_10 {
         }
 
         // 如果模式串和待匹配字符串都到了结尾
+        // 这边之所以不加sLen的判断，是因为会出现sIndex 已经到结尾，但是pIndex没到结尾，仍然会匹配的情况
         if (pIndex >= pLen) {
             if (sLen <= sIndex) {
                 find = true;
@@ -92,6 +93,9 @@ public class Solution_10 {
         }
         //如果当前匹配的元素的下一个是* 分成几种情况
         if (pIndex + 1 < pLen && p.charAt(pIndex + 1) == '*') {
+            // 这种情况出现的原因是在于*可以表示0个
+            // 假设匹配串是 aa,模式串是 aab*c*d*
+            // 这样仍然是可以匹配的，因为匹配串已经到结尾，所以这种情况，直接跳过*即可
             if (sIndex >= sLen) {
                 backtrace(s, sIndex, sLen, p, pIndex + 2, pLen);
             } else {
@@ -115,13 +119,15 @@ public class Solution_10 {
                     backtrace(s, sIndex, sLen, p, pIndex + 2, pLen);
                 }
             }
-        }
+        } else {
 
-        if (sIndex >= sLen) {
-            return;
-        }
-        if (p.charAt(pIndex) == s.charAt(sIndex) || p.charAt(pIndex) == '.') {
-            backtrace(s, sIndex + 1, sLen, p, pIndex + 1, pLen);
+            // 这边加上判断是因为 前文没有对这个做判断，这边如果不加的话 下面的相比会报数组越界
+            if (sIndex >= sLen) {
+                return;
+            }
+            if (p.charAt(pIndex) == s.charAt(sIndex) || p.charAt(pIndex) == '.') {
+                backtrace(s, sIndex + 1, sLen, p, pIndex + 1, pLen);
+            }
         }
     }
 
