@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.Stack;
 
 /**
  * @auth Nannf
@@ -13,30 +14,37 @@ public class Solution_300 {
 
 
     public static void main(String[] args) {
-        int[] nums = new int[]{10, 9, 2, 5, 3, 7, 101, 18};
+        int[] nums = new int[]{1,3,6,7,9,4,10,5,6};
         System.out.println(new Solution_300().lengthOfLIS(nums));
     }
-
-    // 我们要找的其实是每个数，后面比他大的数有多少
-    // 看到最值，我的脑海中又浮现了动态规划
-    // 这个要怎么归呢？
-    // 动态规划都是以小推大
-    // 如果数组只有一个值，那答案就是1
-    // 如果数组中有两个值，那如果第二个值比第一个大，就是2，如果小就还是1
-    // 题目并没有要求 子序列必须是连续的
-    // 我们回到最开始，假设i个数的最大值是k 问当i+1时，最大值是多少
-    // 这个的问题就在，你不能把一个数之后的所有比这个数大的数都作为连续上升序列，
     public int lengthOfLIS(int[] nums) {
         int ans = 0;
         int n = nums.length;
-        // 我们用 dp[i][j] 表示下标从i-j的最长的子序列
-        int[][] dp = new int[n][n];
+        // 我们用一个栈来保存，没一个数在遍历后面所有数据的时候所有比它值大的
+        Stack<Integer> stack = new Stack<>();
         for (int i = 0; i < n; i++) {
-            Arrays.fill(dp[i], 0);
-            dp[i][i] = 1;
-        }
-        for (int i = 0; i < n; i++) {
+            // 多个值共用一个栈
+            stack.clear();
+            // 栈顶是我们当前的数字
+            stack.push(nums[i]);
             for (int j = i + 1; j < n; j++) {
+                // 只有比当前值大的才可以入栈
+                if (nums[j] > nums[i]) {
+                    while (!stack.isEmpty()) {
+                        // 当栈顶的元素比当前的元素大，表示，虽然上升曲线出现了下坡
+                        // 为了保证后面的序列最大，我们需要用比当前遍历元素大的，且最小的那个值
+                        if (stack.peek() > nums[j]) {
+                            ans = Math.max(stack.size(), ans);
+                            stack.pop();
+                        } else {
+                            break;
+                        }
+                    }
+                    stack.push(nums[j]);
+                }
+            }
+            if (!stack.isEmpty()) {
+                ans = Math.max(stack.size(), ans);
             }
         }
         return ans;
