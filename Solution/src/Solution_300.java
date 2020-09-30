@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Stack;
 
 /**
@@ -14,39 +16,39 @@ public class Solution_300 {
 
 
     public static void main(String[] args) {
-        int[] nums = new int[]{1,3,6,7,9,4,10,5,6};
+        int[] nums = new int[]{1, 3, 6, 7, 9, 4, 10, 5, 6};
         System.out.println(new Solution_300().lengthOfLIS(nums));
     }
+
+
+    // 这题关于状态的定义其实听关键的，我们可以定义dp[i]为下标在[0,i]之间的最长子序列的长度
+    // 这样的话，dp[n-1]就是我们要求的解，但是 这地方有个问题，就是dp[i]和i这个值关系其实不是很大的。
+    // 我们在做状态转移的时候，从i-1 --> i 的时候，不知道上一个状态的具体位置，这个只是我个人的一点理解，也是参照题解给出的答案理解出来的
+    // 这是不是就意味者，我们定义的状态是要跟这个下标有联系的呢？ 这个我们后期多做题，多总结
+    // 还有一种定义方式，就是，把dp[i]定义为以nums[i]结尾的最长上升子序列的长度的解。
+    // 这样在 i -1 --> i 的时候，从0遍历到i-1 如果在遍历的过程中，nums[i] 大于遍历的值，那么dp[i]的一个解就是大于的那个下标，我们记为j dp[j]+1
+    // 最后我们从遍历得到的解集合中找到一个最大值，即为dp[i]的最终解
+    // 这里面需要先明确一个事情，就是
     public int lengthOfLIS(int[] nums) {
-        int ans = 0;
         int n = nums.length;
-        // 我们用一个栈来保存，没一个数在遍历后面所有数据的时候所有比它值大的
-        Stack<Integer> stack = new Stack<>();
-        for (int i = 0; i < n; i++) {
-            // 多个值共用一个栈
-            stack.clear();
-            // 栈顶是我们当前的数字
-            stack.push(nums[i]);
-            for (int j = i + 1; j < n; j++) {
-                // 只有比当前值大的才可以入栈
-                if (nums[j] > nums[i]) {
-                    while (!stack.isEmpty()) {
-                        // 当栈顶的元素比当前的元素大，表示，虽然上升曲线出现了下坡
-                        // 为了保证后面的序列最大，我们需要用比当前遍历元素大的，且最小的那个值
-                        if (stack.peek() > nums[j]) {
-                            ans = Math.max(stack.size(), ans);
-                            stack.pop();
-                        } else {
-                            break;
-                        }
-                    }
-                    stack.push(nums[j]);
+        if (n == 0) {
+            return 0;
+        }
+
+        int[] dp = new int[n];
+        dp[0] = 1;
+        int ans = 1;
+        for (int i = 1; i < n; i++) {
+            int tmp = 0;
+            for (int j = 0; j < i; j++) {
+                if (nums[i] > nums[j]) {
+                    tmp = Math.max(tmp, dp[j]);
                 }
             }
-            if (!stack.isEmpty()) {
-                ans = Math.max(stack.size(), ans);
-            }
+            dp[i] = tmp + 1;
+            ans = Math.max(dp[i], ans);
         }
         return ans;
     }
+
 }
