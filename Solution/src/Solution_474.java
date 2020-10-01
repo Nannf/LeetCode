@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -20,23 +21,36 @@ import java.util.List;
  * 输出: 2
  * 解释: 你可以拼出 "10"，但之后就没有剩余数字了。更好的选择是拼出 "0" 和 "1" 。
  * <p>
- *
- *     ["10","0001","111001","1","0"]
+ * <p>
+ * ["10","0001","111001","1","0"]
  * 3
  * 4
+ *
+ * ["10","0001","111001","1","0"]
+ * 4
+ * 3
+ *
+ * ["11111","100","1101","1101","11000"]
+ * 5
+ * 7
  */
 public class Solution_474 {
 
     public static void main(String[] args) {
-        String[] strs = {"10","0001","111001","1","0"};
-        System.out.println(new Solution_474().findMaxForm(strs,3,4));
+        String[] strs = {"11111","100","1101","1101","11000"};
+        System.out.println(new Solution_474().findMaxForm(strs, 5, 7));
     }
+
     int ans = 0;
 
     // 动态规划，由小推大
     // 第一步就是建议每一步的状态
     // 本题回溯可以解
-    // 先尝试使用回溯进行解法
+    // 先尝试使用回溯进行解法,不出意外，回溯超时
+    // 回溯超时，就需要用备忘录了
+    // 备忘录是为了不重复计算，哪些属于重复计算呢？
+    // 我们可以单纯的使用m和n作为备忘录的条件吗
+    // 其实是不可以的，我们需要把已做的选择
     public int findMaxForm(String[] strs, int m, int n) {
         // 这是回溯过程中的轨迹
         List<Integer> trace = new ArrayList<>();
@@ -45,20 +59,33 @@ public class Solution_474 {
     }
 
     private void backtrace(List<Integer> trace, String[] strs, int m, int n) {
-        // 如果 m =0 并且 n= 0表示数字用完，回溯结束
-        if (m <= 0 && n <= 0) {
+        // 结束条件是给定的0和1 全部用完了 或者 已经遍历到数组的最后了
+        if ((m <= 0 && n <= 0) || judge(trace,strs.length -1)) {
             ans = Math.max(ans, trace.size());
             return;
         }
         for (int i = 0; i < strs.length; i++) {
+            if (trace.contains(i)) {
+                continue;
+            }
             int oneNum = countOneNumber(strs[i].toCharArray(), 1);
             int zeroNum = countOneNumber(strs[i].toCharArray(), 0);
-            if (m >= zeroNum && n >= oneNum && !trace.contains(i)) {
+            if (m >= zeroNum && n >= oneNum ) {
                 trace.add(i);
                 backtrace(trace, strs, m - zeroNum, n - oneNum);
                 trace.remove(trace.size() - 1);
+            } else {
+                ans = Math.max(ans, trace.size());
             }
         }
+    }
+
+    private boolean judge(List<Integer> trace,int len) {
+        int max = 0;
+        for (int i : trace) {
+            max = Math.max(max,i);
+        }
+        return max == len;
     }
 
     private int countOneNumber(char[] chars, int num) {
