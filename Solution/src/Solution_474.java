@@ -59,41 +59,52 @@ public class Solution_474 {
     int ans = 0;
 
     public int findMaxForm(String[] strs, int m, int n) {
+        // 我们定义子问题 一定是因为我们发现了重复计算的部分，
+        // 而不是凭感觉就定义一个东西，然后碰运气
+        // 如果要明白重复计算的部分，就需要直到回溯的全过程
+        // 画出递归的运行图
+        // 找到重复计算的部分
+        // 0-1背包的重复原因是因为有一些同样重量的物品是挨着的，这就导致了重复问题的出现
+        // 这就意味着，如果只选择他们其中一个的话，选择谁都后面的影响都是一致的，也就是这两个只需要计算一个
+        // 当这个重复的数字有很多的时候 也是一样的
+        // 也就是无论选择这些重复数字中的谁，到后面不重复的位置而言，都是一样的，
+        // 所以这个重复的状态就是在某个位置上，如果剩余的m和n是一样的，就是重复计算
+        // 根据这个我们定义了一个三维数组
         int[][][] memo = new int[strs.length + 1][m + 1][n + 1];
+        // 照例 定义出了我们在回溯过程中的轨迹记录
         List<Integer> trace = new ArrayList<>();
-        backtrace(trace, strs, m, n, 0, memo);
+        backtrace(strs, m, n, 0, trace, memo);
         return ans;
     }
 
-    private void backtrace(List<Integer> trace, String[] strs, int m, int n, int s, int[][][] memo) {
-        if (trace.size() >= 43) {
-            System.out.println("回溯的轨迹是：" + trace);
-        }
+    private void backtrace(String[] strs, int m, int n, int s, List<Integer> trace, int[][][] memo) {
+        // 在进行计算之前，我们要判断当前的数据有没有被计算过
         if (memo[s][m][n] != 0) {
             return;
         }
         memo[s][m][n] = 1;
-        // 如果0和1的数量全部用完了，或者没用完，但是已经
-        if ((m <= 0 && n <= 0) || s == strs.length) {
+
+
+        // 接下来是关于结束状态的定义 如果数组中所有的元素都已经过滤完成，直接结束
+        if (s == strs.length) {
             ans = Math.max(ans, trace.size());
             return;
         }
+
+        // 下面的是选择阶段
         for (; s < strs.length; s++) {
+            // 先计算出如果要选择当前索引，需要多少0和1
             int oneNum = countOneNumber(strs[s].toCharArray(), 1);
             int zeroNum = countOneNumber(strs[s].toCharArray(), 0);
+
             // 只有m和n同时满足需求，才可以加到最终的结果集中
             if (m >= zeroNum && n >= oneNum) {
                 trace.add(s);
-                backtrace(trace, strs, m - zeroNum, n - oneNum, s + 1, memo);
-                if (trace.size() == 13) {
-                    System.out.println("bingo!");
-                }
+                backtrace(strs, m - zeroNum, n - oneNum, s + 1, trace, memo);
                 trace.remove(trace.size() - 1);
-            } else {
-                // 如果有一个不满足，就不能继续回溯
-                ans = Math.max(ans, trace.size());
             }
         }
+        ans = Math.max(ans, trace.size());
     }
 
     private int countOneNumber(char[] chars, int num) {
