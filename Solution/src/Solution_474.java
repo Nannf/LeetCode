@@ -1,3 +1,5 @@
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -51,12 +53,14 @@ import java.util.List;
  */
 public class Solution_474 {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+//        //一次性创建PrintStream输出流
+//        PrintStream ps = new PrintStream(new FileOutputStream("D://test1.txt"));
+//        //将标准输出重定向到PS输出流
+//        System.setOut(ps);
         String[] strs = {"011", "1", "11", "0", "010", "1", "10", "1", "1", "0", "0", "0", "01111", "011", "11", "00", "11", "10", "1", "0", "0", "0", "0", "101", "001110", "1", "0", "1", "0", "0", "10", "00100", "0", "10", "1", "1", "1", "011", "11", "11", "10", "10", "0000", "01", "1", "10", "0"};
         System.out.println(new Solution_474().findMaxForm(strs, 44, 39));
     }
-
-    int ans = 0;
 
     public int findMaxForm(String[] strs, int m, int n) {
         // 我们定义子问题 一定是因为我们发现了重复计算的部分，
@@ -71,49 +75,45 @@ public class Solution_474 {
         // 所以这个重复的状态就是在某个位置上，如果剩余的m和n是一样的，就是重复计算
         // 根据这个我们定义了一个三维数组
         int[][][] memo = new int[strs.length + 1][m + 1][n + 1];
-        // 照例 定义出了我们在回溯过程中的轨迹记录
-        List<Integer> trace = new ArrayList<>();
-        backtrace(strs, m, n, 0, trace, memo);
-        return ans;
+        backtrace(strs, m, n, 0, memo);
+        return memo[0][m][n];
     }
 
-    private void backtrace(String[] strs, int m, int n, int s, List<Integer> trace, int[][][] memo) {
+    private int backtrace(String[] strs, int m, int n, int s, int[][][] memo) {
+//        System.out.println(trace);
         // 在进行计算之前，我们要判断当前的数据有没有被计算过
+        // 这边有个问题就是计算过就应该被跳过吗？
+        // 我觉得不是把，举个简单的例子，就是如果一个是是100个1，然后它后面跟了100个单独的1
+        // 对这101个数后面的数而言，选择100个1 的数还是选择100个单独的1的数跟他的数量都是一致的
+        // 为啥要直接跳过呢？
+        // 我好像是个脑瘫
+        // 这个函数是有返回的
         if (memo[s][m][n] != 0) {
-            return;
+            return memo[s][m][n];
         }
-        memo[s][m][n] = 1;
-
 
         // 接下来是关于结束状态的定义 如果数组中所有的元素都已经过滤完成，直接结束
         if (s == strs.length) {
-            ans = Math.max(ans, trace.size());
-            return;
+            return 0;
         }
 
-        // 下面的是选择阶段
-        for (; s < strs.length; s++) {
-            // 先计算出如果要选择当前索引，需要多少0和1
-            int oneNum = countOneNumber(strs[s].toCharArray(), 1);
-            int zeroNum = countOneNumber(strs[s].toCharArray(), 0);
-
-            // 只有m和n同时满足需求，才可以加到最终的结果集中
-            if (m >= zeroNum && n >= oneNum) {
-                trace.add(s);
-                backtrace(strs, m - zeroNum, n - oneNum, s + 1, trace, memo);
-                trace.remove(trace.size() - 1);
-            }
+        // 先计算出如果要选择当前索引，需要多少0和1
+        int[] numInfo = countZeroAndOne(strs[s]);
+        if (m >= numInfo[0] && n >= numInfo[1]) {
+            memo[s][m][n] = Math.max(backtrace(strs, m - numInfo[0], n - numInfo[1], s + 1, memo) + 1,
+                    backtrace(strs, m, n, s + 1, memo));
+        } else {
+            // 这边不满足的时候，当前状况下的值等于下一个状态的值
+            memo[s][m][n] = backtrace(strs, m, n, s + 1, memo);
         }
-        ans = Math.max(ans, trace.size());
+        return memo[s][m][n];
     }
 
-    private int countOneNumber(char[] chars, int num) {
-        int ans = 0;
-        for (char c : chars) {
-            if (Integer.parseInt(String.valueOf(c)) == num) {
-                ans++;
-            }
+    private int[] countZeroAndOne(String str) {
+        int[] cnt = new int[2];
+        for (char c : str.toCharArray()) {
+            cnt[c - '0']++;
         }
-        return ans;
+        return cnt;
     }
 }
