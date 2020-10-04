@@ -59,6 +59,7 @@ public class Solution_474 {
     }
 
     public int findMaxForm(String[] strs, int m, int n) {
+        int ans = 0;
         // 昨天使用递归的方式实现了背包的问题的解法
         // 今天尝试使用动态规划的角度来对背包问题进行解答
         // 动态规划的思路时：
@@ -67,9 +68,39 @@ public class Solution_474 {
 
         // 我们据此定义了状态数组
         // 分别表示每次做一个选择之后，对应的m和n的状态
-        int[][][] dp = new int[strs.length][m][n];
+        // 下一个我们就需要明白两件事
+        // 1. 如何由已知的状态推到出新的状态
+        // 2. 如何合并每一层的重复状态
+        int[][][] dp = new int[strs.length][m + 1][n + 1];
 
-        int ans = 0;
+        for (int i = 0; i < strs.length; i++) {
+            for (int j = 0; j <= m; j++) {
+                for (int k = 0; k <= n; k++) {
+                    dp[i][j][k] = -1;
+                }
+            }
+        }
+        // 先计算第一个元素选不选的状态
+        int[] numCount = countZeroAndOne(strs[0]);
+        // 不选的状态
+        dp[0][m][n] = 0;
+        // 选择的状态
+        dp[0][m - numCount[0]][n - numCount[1]] = 1;
+        // 这个动态转移方程要怎么想呢？
+        for (int i = 1; i < strs.length; i++) {
+            int[] numInfo = countZeroAndOne(strs[i]);
+            for (int j = 0; j < m; j++) {
+                for (int k = 0; k < n; k++) {
+                    // 第一个判断条件表示是从上一个状态迁移而来
+                    if (dp[i - 1][j][k] == 1 && j >= numInfo[0] && k >= numInfo[1]) {
+                        // 当满足条件的时候我们可以选或者不选
+                        // 这两种情况分别对应了一种情况，但是选不选是跟数组后面的元素是相关的
+                        // 不满足无后效性这一特征
+                        // 我想起了之前做的一个地下城与勇士的题目，这种有后效性的题目需要由后往前逆推。
+                    }
+                }
+            }
+        }
 
 
         return ans;
