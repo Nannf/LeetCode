@@ -54,55 +54,63 @@ import java.util.List;
 public class Solution_474 {
 
     public static void main(String[] args) throws Exception {
-        String[] strs = {"011", "1", "11", "0", "010", "1", "10", "1", "1", "0", "0", "0", "01111", "011", "11", "00", "11", "10", "1", "0", "0", "0", "0", "101", "001110", "1", "0", "1", "0", "0", "10", "00100", "0", "10", "1", "1", "1", "011", "11", "11", "10", "10", "0000", "01", "1", "10", "0"};
-        System.out.println(new Solution_474().findMaxForm(strs, 44, 39));
+        String[] strs = {"10", "0", "1"};
+        System.out.println(new Solution_474().findMaxForm(strs, 1, 1));
     }
 
     public int findMaxForm(String[] strs, int m, int n) {
         int ans = 0;
-        // 昨天使用递归的方式实现了背包的问题的解法
-        // 今天尝试使用动态规划的角度来对背包问题进行解答
-        // 动态规划的思路时：
-        // 把问题的解决分为很多个阶段，每个阶段可以有不同的选择，每种的选择之后会对应不同的状态
-        // 然后把状态进行合并，在这个题目中的状态就是剩余的0和1的个数，所以每层最多的状态数就是n*m
+        // 关于这个状态数组的定义，今天看到一句话
+        // 题目问什么我们就怎么定义
+        // 假设给定的字符串数组的长度是k,0和1的个数分别是m，n
+        // 拿题目要求的就是 使用m个0和n个1在[0,k-1]上最多能选择几个字符串出来
+        // 那么我们就定义状态数组如下dp[i][j][k]在[0,i]上使用j个0和k个1能选择多少字符串出来
+        int[][][] dp = new int[strs.length + 1][m + 1][n + 1];
 
-        // 我们据此定义了状态数组
-        // 分别表示每次做一个选择之后，对应的m和n的状态
-        // 下一个我们就需要明白两件事
-        // 1. 如何由已知的状态推到出新的状态
-        // 2. 如何合并每一层的重复状态
-        int[][][] dp = new int[strs.length][m + 1][n + 1];
-
-        for (int i = 0; i < strs.length; i++) {
+        // 定义完状态之后就需要去找动态转移方程，就是如何由前一个状态推导出后一个状态
+        // 对一个状态dp[i][j][k]而言，它的最大值是多少呢，我们要明白这个问题，就需要先知道
+        // 这个j和k是怎么来的，最开始的状态是dp[0][0][0]=0;
+        // dp[1][]
+        for (int i = 0; i <= strs.length; i++) {
             for (int j = 0; j <= m; j++) {
                 for (int k = 0; k <= n; k++) {
                     dp[i][j][k] = -1;
                 }
             }
         }
-        // 先计算第一个元素选不选的状态
-        int[] numCount = countZeroAndOne(strs[0]);
-        // 不选的状态
-        dp[0][m][n] = 0;
-        // 选择的状态
-        dp[0][m - numCount[0]][n - numCount[1]] = 1;
+        // 初始化数组，这个使用哨兵优化
+        dp[0][0][0] = 0;
+
         // 这个动态转移方程要怎么想呢？
-        for (int i = 1; i < strs.length; i++) {
-            int[] numInfo = countZeroAndOne(strs[i]);
-            for (int j = 0; j < m; j++) {
-                for (int k = 0; k < n; k++) {
-                    // 第一个判断条件表示是从上一个状态迁移而来
-                    if (dp[i - 1][j][k] == 1 && j >= numInfo[0] && k >= numInfo[1]) {
-                        // 当满足条件的时候我们可以选或者不选
-                        // 这两种情况分别对应了一种情况，但是选不选是跟数组后面的元素是相关的
-                        // 不满足无后效性这一特征
-                        // 我想起了之前做的一个地下城与勇士的题目，这种有后效性的题目需要由后往前逆推。
+        for (int i = 1; i <= strs.length; i++) {
+            int[] numInfo = countZeroAndOne(strs[i - 1]);
+            for (int j = 0; j <= m; j++) {
+                for (int k = 0; k <= n; k++) {
+                    // 这个状态不等于-1表示这个状态是之前的状态迁移过来的
+                    if (dp[i - 1][j][k] != -1) {
+                        // 如果迁移的这个状态剩余的0和1还够当前的元素使用
+                        if ((m - j) >= numInfo[0] && (n - k) >= numInfo[1]) {
+                            // 这边会对应两个状态
+                            // 一个是不选的状态
+                            // 这个时候 这个状态就跟上一个一致
+                            dp[i][j][k] = dp[i - 1][j][k];
+
+                            // 还有一个就是选的状态，选的状态需要把坐标移动，并把上一个状态的值+1
+                            dp[i][j + numInfo[0]][k + numInfo[1]] = dp[i - 1][j][k] + 1;
+                        } else {
+                            // 如果不够了，那当前元素对应的字符串的数量只能跟上一个一致
+                            dp[i][j][k] = dp[i - 1][j][k];
+                        }
+
                     }
                 }
             }
         }
-
-
+        for (int i =0;i<=m;i++) {
+            for (int j =0; j<=n;j++) {
+                ans = Math.max(ans,dp[strs.length][i][j]);
+            }
+        }
         return ans;
     }
 
