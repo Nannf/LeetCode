@@ -54,8 +54,10 @@ import java.util.List;
 public class Solution_474 {
 
     public static void main(String[] args) throws Exception {
-        String[] strs = {"10", "0", "1"};
-        System.out.println(new Solution_474().findMaxForm(strs, 1, 1));
+        String[] strs = {"011", "1", "11", "0", "010", "1", "10", "1", "1", "0", "0", "0", "01111", "011", "11", "00",
+                "11", "10", "1", "0", "0", "0", "0", "101", "001110", "1", "0", "1", "0", "0", "10", "00100",
+                "0", "10", "1", "1", "1", "011", "11", "11", "10", "10", "0000", "01", "1", "10", "0"};
+        System.out.println(new Solution_474().findMaxForm(strs, 44, 39));
     }
 
     public int findMaxForm(String[] strs, int m, int n) {
@@ -93,22 +95,22 @@ public class Solution_474 {
                             // 这边会对应两个状态
                             // 一个是不选的状态
                             // 这个时候 这个状态就跟上一个一致
-                            dp[i][j][k] = dp[i - 1][j][k];
+                            dp[i][j][k] = Math.max(dp[i - 1][j][k], dp[i][j][k]);
 
                             // 还有一个就是选的状态，选的状态需要把坐标移动，并把上一个状态的值+1
-                            dp[i][j + numInfo[0]][k + numInfo[1]] = dp[i - 1][j][k] + 1;
+                            dp[i][j + numInfo[0]][k + numInfo[1]] = Math.max(dp[i - 1][j][k] + 1, dp[i][j + numInfo[0]][k + numInfo[1]]);
                         } else {
                             // 如果不够了，那当前元素对应的字符串的数量只能跟上一个一致
-                            dp[i][j][k] = dp[i - 1][j][k];
+                            dp[i][j][k] = Math.max(dp[i - 1][j][k], dp[i][j][k]);
                         }
 
                     }
                 }
             }
         }
-        for (int i =0;i<=m;i++) {
-            for (int j =0; j<=n;j++) {
-                ans = Math.max(ans,dp[strs.length][i][j]);
+        for (int i = 0; i <= m; i++) {
+            for (int j = 0; j <= n; j++) {
+                ans = Math.max(ans, dp[strs.length][i][j]);
             }
         }
         return ans;
