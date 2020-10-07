@@ -16,44 +16,10 @@ import java.util.Arrays;
  */
 public class Solution_309 {
 
-    // 先来bb一波
-    // 题目要求的是给定长度为n的数组，计算出最大利润
-    // 我们就设我们的状态为dp[j] 表示长度为j的数组的最大利润
-    // 那最后dp[n-1]就是我们要求的答案
-    // 股票得先买，买了必须得卖，卖了之后有冷冻期
-    // 除了 买  卖 冷冻期 还有一个就是观望，什么都不操作
-    // 所以我们到达一个位置的时候会有多个状态
-    // 此时我们的一维数组无法表达多个状态
-    // 我们需要用二维数组
+
     public int maxProfit(int[] prices) {
         int ans = 0;
-        // dp[i][0] 表示是买 dp[i][1] 表示是卖  dp[i][2] 是冷冻 dp[i][3] 是不操作
-        int[][] dp = new int[prices.length][4];
-        for (int i = 0; i < dp.length; i++) {
-            Arrays.fill(dp[i], -1);
-        }
-        dp[0][0] = 0 - prices[0];
-        dp[0][3] = 0;
-
-        for (int i = 1; i < dp.length; i++) {
-            // 说明这个之前买过股票
-            if (dp[i - 1][0] != -1) {
-                // 这边可以继续观望，
-                dp[i][3] = dp[i - 1][0];
-                //或者卖掉股票
-                dp[i][1] = prices[i] - dp[i - 1][0];
-                dp[i][2] = 1;
-            } else if (dp[i - 1][1] != -1) {
-                if (dp[i - 1][2] != -1) {
-                    // 说明昨天刚卖过
-                    dp[i][1] = dp[i - 1][1];
-                    dp[i][2] = -1;
-                } else {
-
-                }
-
-            }
-        }
+        int[] dp = new int[prices.length];
         return ans;
     }
 }
