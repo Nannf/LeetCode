@@ -26,14 +26,33 @@ import java.util.List;
  */
 public class Solution_276 {
     public static void main(String[] args) {
-        System.out.println(new Solution_276().numWays(2,46340));
+        System.out.println(new Solution_276().numWays(3,3));
+    }
+
+
+
+    public int numWays(int n, int k) {
+        if (n == 0 || k ==0) {
+            return 0;
+        }
+        if (n <= 2) {
+            return (int) Math.pow(k,n);
+        }
+        int[][] dp = new int[n+1][k+1];
+        dp[1][k] = k;
+        dp[2][k] = k*k;
+        for (int i = 3; i<=n;i++) {
+            // 每次在新增一个柱子的时候，新增柱子上的颜色都可以是k中的任何一个，但是要去除上一个情况下能组成两个连续的情况
+            dp[i][k] = Math.max(k*dp[i-1][k] - (i-1),0);
+        }
+        return dp[n][k];
     }
 
     // 回溯可解，但是时间复杂都是k^n 贼高，先试试回溯会不会超时
     // 回溯最后还需要去重
     // 先试试把
     // 超出了内存限制
-    public int numWays(int n, int k) {
+    public int numWays_backtrace(int n, int k) {
         if (n == 0 || k ==0) {
             return 0;
         }
