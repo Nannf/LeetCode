@@ -29,6 +29,7 @@ public class Review_1716 {
         System.out.println(new Review_1716().massage(nums));
     }
     // 打家劫舍换个问法
+
     public int massage(int[] nums) {
         if (nums.length == 0) {
             return 0;
@@ -39,6 +40,7 @@ public class Review_1716 {
         if (nums.length == 2) {
             return Math.max(nums[0], nums[1]);
         }
+        // dp[i] 表示到i这个下标的最大值
         int[] dp = new int[nums.length];
         dp[0] = nums[0];
         dp[1] = Math.max(nums[0], nums[1]);
