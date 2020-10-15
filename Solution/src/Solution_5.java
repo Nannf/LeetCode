@@ -13,10 +13,90 @@ import java.util.*;
  */
 public class Solution_5 {
     public static void main(String[] args) {
-        System.out.println(new Solution_5().longestPalindrome("ac"));
+        System.out.println(new Solution_5().longestPalindrome("aba"));
+    }
+
+    static class CheckResult {
+        boolean findFlag;
+        String matchString;
+
+        public boolean isFindFlag() {
+            return findFlag;
+        }
+
+        public void setFindFlag(boolean findFlag) {
+            this.findFlag = findFlag;
+        }
+
+        public String getMatchString() {
+            return matchString;
+        }
+
+        public void setMatchString(String matchString) {
+            this.matchString = matchString;
+        }
     }
 
     public String longestPalindrome(String s) {
+        if (s.length() <= 1) {
+            return s;
+        }
+        StringBuilder resultString = new StringBuilder(s.substring(0, 1));
+        int ans = 1;
+        // 感觉二分查找可以做
+        // 二分好像不能做，因为如果不满足 其实不代表 长度比它长的就不满足回文序列
+        // 还得从高到低逐个遍历才行
+        int low = 1;
+        int high = s.length();
+
+        while (low <= high) {
+            int mid = low + ((high - low) >> 1);
+            CheckResult checkResult = check(mid, s);
+            if (checkResult.findFlag) {
+                low = mid + 1;
+                if (mid > ans) {
+                    ans = mid;
+                    resultString.setLength(0);
+                    resultString.append(checkResult.matchString);
+                }
+            } else {
+                high = mid - 1;
+            }
+        }
+        return resultString.toString();
+    }
+
+    private CheckResult check(int mid, String s) {
+        CheckResult checkResult = new CheckResult();
+        int i = 0;
+        int j = mid;
+        while (j <= s.length()) {
+            if (isPalindrome(s.substring(i, j))) {
+                checkResult.findFlag = true;
+                checkResult.matchString = s.substring(i, j);
+                return checkResult;
+            } else {
+                i++;
+                j++;
+            }
+        }
+        return checkResult;
+    }
+
+
+    private static boolean isPalindrome(String str) {
+        char[] c = str.toCharArray();
+        int i = 0;
+        int j = str.length() - 1;
+        while (i < j) {
+            if (!(c[i++] == c[j--])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public String longestPalindrome_before(String s) {
         if (s.length() <= 1) {
             return s;
         }
@@ -46,17 +126,6 @@ public class Solution_5 {
         }
     }
 
-    private static boolean isPalindrome(String str) {
-        char[] c = str.toCharArray();
-        int i = 0;
-        int j = str.length() - 1;
-        while (i < j) {
-            if (!(c[i++] == c[j--])) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     public String longestPalindrome_NotPass(String s) {
         if (s.length() <= 1) {
