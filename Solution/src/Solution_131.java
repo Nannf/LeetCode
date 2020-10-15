@@ -19,37 +19,40 @@ import java.util.List;
  */
 public class Solution_131 {
 
-    public List<List<String>> partition(String s) {
+    public  List<List<String>> findAllSub(String s) {
         List<List<String>> ans = new ArrayList<>();
         List<String> trace = new ArrayList<>();
-        backtrace(ans, trace, 0, s);
+        backtrace(ans, trace, s, 0);
         return ans;
     }
 
-    // 问题就是如何拆分成子串呢
-    private void backtrace(List<List<String>> ans, List<String> trace, int i, String s) {
-        if (i == s.length()) {
-            List<String> tmp = new ArrayList<>();
-            if (!judgeContains(ans, trace)) {
-                ans.add(tmp);
-            }
+    private  void backtrace(List<List<String>> ans, List<String> trace, String srcString, int startIndex) {
+        if (startIndex >= srcString.length()) {
+            ans.add(new ArrayList<>(trace));
             return;
+        }
+        for (int i = 1; i <= srcString.length() - startIndex; i++) {
+            String tmp = srcString.substring(startIndex, startIndex + i);
+            if (isDupulicate(tmp)) {
+                trace.add(tmp);
+                backtrace(ans, trace, srcString, startIndex + i);
+                trace.remove(trace.size() - 1);
+            }
         }
     }
 
-    private boolean judgeContains(List<List<String>> ans, List<String> trace) {
-        Loop1:
-        for (List<String> list : ans) {
-            if (list.size() != trace.size()) {
-                continue;
-            }
-            for (int i = 0; i < list.size(); i++) {
-                if (!list.get(i).equalsIgnoreCase(trace.get(i))) {
-                    continue Loop1;
-                }
-            }
+    private  boolean isDupulicate(String tmp) {
+        if (tmp.length() == 1) {
             return true;
         }
-        return false;
+        int i = 0;
+        int j = tmp.length() -1;
+        while (i<=j) {
+            if (tmp.charAt(i++) != tmp.charAt(j--)) {
+                return false;
+            }
+        }
+        return true;
     }
+
 }
