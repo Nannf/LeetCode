@@ -13,7 +13,7 @@
  */
 public class Review_0801 {
     public static void main(String[] args) {
-        System.out.println(new Review_0801().waysToStep(5));
+        System.out.println(new Review_0801().waysToStep(76));
     }
 
     public int waysToStep(int n) {
@@ -38,8 +38,9 @@ public class Review_0801 {
         dp[1] = 2;
         dp[2] = 4;
         for (int i = 3; i < n; i++) {
+            dp[i] = (dp[i-1] + dp[i-2] + dp[i-3]) % 1000000007;
         }
-        return (int)(dp[n - 1] % 1000000007);
+        return (int)(dp[n - 1]);
 
     }
 }
