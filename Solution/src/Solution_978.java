@@ -24,7 +24,72 @@
  * 输出：1
  */
 public class Solution_978 {
-    public int maxTurbulenceSize(int[] A) {
-        return -1;
+
+    public static void main(String[] args) {
+
+    }
+    public  int maxTurbulenceSize(int[] nums) {
+        if (nums.length <= 1) {
+            return nums.length;
+        }
+        // 先找偶数大的湍流子数组长度
+        int evenMax = 1;
+        // 我们对动态转移的定义 和之前的子数组类似，以当前索引为结尾的子数组的长度作为
+        int[] evenMaxDp = new int[nums.length];
+        evenMaxDp[0] = 1;
+        for (int i = 1; i < nums.length; i++) {
+            // 是偶数
+            if (i % 2 != 0) {
+                // 表示上一个奇数是比当前的偶数大的，当前偶数是一个新的开始
+                if (nums[i - 1] >= nums[i]) {
+                    evenMaxDp[i] = 1;
+                    evenMax = Math.max(evenMaxDp[i], evenMax);
+                } else {
+                    // 走到这一步，说明串起来了
+                    evenMaxDp[i] = evenMaxDp[i - 1] + 1;
+                    evenMax = Math.max(evenMaxDp[i], evenMax);
+                }
+            } else {
+                // 如果奇数的前一个比它小，当前奇数是新的开始
+                if (nums[i - 1] <= nums[i]) {
+                    evenMaxDp[i] = 1;
+                    evenMax = Math.max(evenMaxDp[i], evenMax);
+                } else {
+                    // 走到这一步，说明串起来了
+                    evenMaxDp[i] = evenMaxDp[i - 1] + 1;
+                    evenMax = Math.max(evenMaxDp[i], evenMax);
+                }
+            }
+        }
+
+        // 再找奇数大的湍流子数组的长度
+        int oddMax = 1;
+        int[] oddMaxDp = new int[nums.length];
+        oddMaxDp[0] = 1;
+        for (int i = 1; i < nums.length; i++) {
+            // 是偶数
+            if (i % 2 != 0) {
+                if (nums[i - 1] <= nums[i]) {
+                    oddMaxDp[i] = 1;
+                    oddMax = Math.max(oddMaxDp[i], oddMax);
+                } else {
+                    // 走到这一步，说明串起来了
+                    oddMaxDp[i] = oddMaxDp[i - 1] + 1;
+                    oddMax = Math.max(oddMaxDp[i], oddMax);
+                }
+            } else {
+                // 如果奇数的前一个比它小，当前奇数是新的开始
+                if (nums[i - 1] >= nums[i]) {
+                    oddMaxDp[i] = 1;
+                    oddMax = Math.max(oddMaxDp[i], oddMax);
+                } else {
+                    // 走到这一步，说明串起来了
+                    oddMaxDp[i] = oddMaxDp[i - 1] + 1;
+                    oddMax = Math.max(oddMaxDp[i], oddMax);
+                }
+            }
+        }
+        // 取两者的最大值，即为最后的答案。
+        return Math.max(evenMax, oddMax);
     }
 }
