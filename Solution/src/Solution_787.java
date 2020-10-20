@@ -67,7 +67,7 @@ public class Solution_787 {
         return minTotal;
     }
 
-    private void backtrace(int dest, int k, int src, LinkedList<LineInfo> edgeInfo, List<LineInfo> trace,
+    private void backtrace(int dest, int k, int src, int[][] edgeInfo, List<LineInfo> trace,
                            boolean[][] visited, Graph graph, int[][][] memo) {
         // 如果此时这个序列中的长度 已经 大于了最终的结果值，直接跳过
         // 第一次剪枝
@@ -86,7 +86,7 @@ public class Solution_787 {
 
         // 第三次剪枝
         // 到达当前节点的路径上如果存在比当前的路径短，而且比当前的总和小的进行过滤
-        if (!notInMemo(src,trace,tmp,memo)) {
+        if (!notInMemo(src, trace, tmp, memo)) {
             return;
         }
         // 当当前处理的节点是目标节点时
@@ -96,11 +96,10 @@ public class Solution_787 {
         }
 
 
-
         for (LineInfo lineInfo : edgeInfo) {
             // 如果当前的节点没有被访问过
             // 用记忆化第二次剪枝
-            if (!visited[src][lineInfo.v] ) {
+            if (!visited[src][lineInfo.v]) {
                 visited[src][lineInfo.v] = true;
                 trace.add(lineInfo);
                 backtrace(dest, k, lineInfo.v, graph.adj[lineInfo.v], trace, visited, graph, memo);
@@ -131,18 +130,15 @@ public class Solution_787 {
     static class Graph {
         // 顶点的个数
         private int v;
-        private LinkedList<LineInfo>[] adj;
+        private int[][][] adj;
 
         public Graph(int v) {
             this.v = v;
-            adj = new LinkedList[v];
-            for (int i = 0; i < v; i++) {
-                adj[i] = new LinkedList<>();
-            }
+            adj = new int[v][v][1];
         }
 
         public void addEdge(int src, int dest, int q) {
-            adj[src].add(new LineInfo(dest, q));
+            adj[src][dest][0] = q;
         }
 
     }
