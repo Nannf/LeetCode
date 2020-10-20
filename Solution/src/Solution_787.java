@@ -1,96 +1,125 @@
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @auth Nannf
  * @date 2020/10/20 15:17
- * @description:
- *
- * 有 n 个城市通过 m 个航班连接。每个航班都从城市 u 开始，以价格 w 抵达 v。
- *
+ * @description: 有 n 个城市通过 m 个航班连接。每个航班都从城市 u 开始，以价格 w 抵达 v。
+ * <p>
  * 现在给定所有的城市和航班，以及出发城市 src 和目的地 dst，
  * 你的任务是找到从 src 到 dst 最多经过 k 站中转的最便宜的价格。 如果没有这样的路线，则输出 -1。
- *
+ * <p>
  * 输入:
  * n = 3, edges = [[0,1,100],[1,2,100],[0,2,500]]
  * src = 0, dst = 2, k = 1
  * 输出: 200
- *
- *输入:
+ * <p>
+ * 输入:
  * n = 3, edges = [[0,1,100],[1,2,100],[0,2,500]]
  * src = 0, dst = 2, k = 0
  * 输出: 500
- *
+ * <p>
  * n 范围是 [1, 100]，城市标签从 0 到 n - 1
  * 航班数量范围是 [0, n * (n - 1) / 2]
  * 每个航班的格式 (src, dst, price)
  * 每个航班的价格范围是 [1, 10000]
  * k 范围是 [0, n - 1]
  * 航班没有重复，且不存在自环
- *
- *
  */
 public class Solution_787 {
     public static void main(String[] args) {
-        int[][] flights = {{3,4,4},{2,5,6},{4,7,10},{9,6,5},{7,4,4},{6,2,10},{6,8,6},{7,9,4},{1,5,4},{1,0,4},{9,7,3},{7,0,5},{6,5,8},{1,7,6},{4,0,9},{5,9,1},{8,7,3},{1,2,6},{4,1,5},{5,2,4},{1,9,1},{7,8,10},{0,4,2},{7,2,8}};
-        System.out.println(new Solution_787().findCheapestPrice(10,flights,6,0,7));
+        int[][] flights = {{0, 1, 5}, {1, 2, 5}, {0, 3, 2}, {3, 1, 2}, {1, 4, 1}, {4, 2, 1}};
+        System.out.println(new Solution_787().findCheapestPrice(5, flights, 0, 2, 2));
     }
 
 
+    int minTotal = Integer.MAX_VALUE;
 
     // 就是给定一个有向无环加权图，给定起始点，和终点，找到起始点到终点的所有路径
     // 然后再通过给定的K过滤掉那些不合法的数据
     // 再从合法的数据中找到最短的那条
-    public  int findCheapestPrice(int n, int[][] flights, int src, int dst, int K) {
+    public int findCheapestPrice(int n, int[][] flights, int src, int dst, int K) {
         Graph graph = new Graph(n);
         // 第一步 先根据给定的数组 构造出这个有向无环加权图
         for (int i = 0; i < flights.length; i++) {
             int[] info = flights[i];
             graph.addEdge(info[0], info[1], info[2]);
         }
-        List<List<LineInfo>> ans = new ArrayList<>();
         List<LineInfo> trace = new ArrayList<>();
         boolean[][] visited = new boolean[n][n];
 
+
+        // 回溯超时，如果是记忆化的话，我想到的是如果到达一个序列 a->b 表示当前节点是a,下一条节点是b，如果此时到达a的路径的大小是存在的，表示是个重复的状态，无需接着往下走，
+        // 当我想到这的时候，发现这个问题似乎是背包问题的一个变种，我们先用记忆化，看看是否能够解决超时的问题，如果无法解决就在试试按照背包问题的解决思路来解决这道题
+
+        // 记忆化我们要保存三个信息 a->b 的信息，还需要保留到达a的时候的已经过路径的大小
+        // 记忆化其实只要记录b就行了，而不用管是从哪个地方来的
+        // key dst value : key :路径长度   value 路径大小
+//        Map<Integer, Map<Integer, Integer>> memo = new HashMap<>();
+        int[][][] memo = new int[n][n + 1][1];
         //找到所有的路径
-        backtrace(dst, K, src, graph.adj[src], ans, trace, visited, graph);
+        backtrace(dst, K, src, graph.adj[src], trace, visited, graph, memo);
 
 
-        if (ans.size() == 0) {
+        if (minTotal == Integer.MAX_VALUE) {
             return -1;
         }
-        int min = Integer.MAX_VALUE;
-        for (List<LineInfo> lineInfos : ans) {
-            int tmp = 0;
-            for (LineInfo lineInfo : lineInfos) {
-                tmp += lineInfo.q;
-            }
-            min = Math.min(min, tmp);
-        }
-        return min;
+        return minTotal;
     }
 
-    private static void backtrace(int dest, int k, int src, LinkedList<LineInfo> edgeInfo, List<List<LineInfo>> ans, List<LineInfo> trace, boolean[][] visited, Graph graph) {
-        // 当当前处理的节点是目标节点时
-        if (src == dest) {
-            if (trace.size() - 1 <= k) {
-                ans.add(new ArrayList<>(trace));
-            }
+    private void backtrace(int dest, int k, int src, LinkedList<LineInfo> edgeInfo, List<LineInfo> trace,
+                           boolean[][] visited, Graph graph, int[][][] memo) {
+        // 如果此时这个序列中的长度 已经 大于了最终的结果值，直接跳过
+        // 第一次剪枝
+        if (trace.size() - 1 > k) {
             return;
         }
 
+        int tmp = 0;
+        for (LineInfo lineInfo : trace) {
+            tmp += lineInfo.q;
+        }
+        // 第二次剪枝
+        if (tmp >= minTotal) {
+            return;
+        }
+        // 当当前处理的节点是目标节点时
+        if (src == dest) {
+            minTotal = Math.min(minTotal, tmp);
+            return;
+        }
+
+        if (!notInMemo(src,trace,tmp,memo)) {
+            return;
+        }
 
         for (LineInfo lineInfo : edgeInfo) {
             // 如果当前的节点没有被访问过
-            if (!visited[src][lineInfo.getV()]) {
-                visited[src][lineInfo.getV()] = true;
+            // 用记忆化第二次剪枝
+            if (!visited[src][lineInfo.v] ) {
+                visited[src][lineInfo.v] = true;
                 trace.add(lineInfo);
-                backtrace(dest, k, lineInfo.getV(), graph.adj[lineInfo.getV()], ans, trace, visited, graph);
+                backtrace(dest, k, lineInfo.v, graph.adj[lineInfo.v], trace, visited, graph, memo);
                 trace.remove(trace.size() - 1);
-                visited[src][lineInfo.getV()] = false;
+                visited[src][lineInfo.v] = false;
             }
         }
+    }
+
+    // memo[][][] 1: 目标节点 2: 路径长度 3： 路径大小
+    private boolean notInMemo(int src, List<LineInfo> trace, int tmp, int[][][] memo) {
+        // 先判断当前有没有到过这个节点
+        for (int i = 0; i < memo[src].length; i++) {
+            // 如果已经到过这个节点
+            // 如果已经有路径比我短，且大小比我小的存在，那么我这个就没必要入了
+            if (memo[src][i][0] != 0) {
+                if (i <= trace.size() && memo[src][i][0] <= tmp) {
+                    System.out.println("skip:" + trace);
+                    return false;
+                }
+            }
+        }
+        memo[src][trace.size()][0] = tmp;
+        return true;
     }
 
 
@@ -136,6 +165,11 @@ public class Solution_787 {
 
         public void setQ(int q) {
             this.q = q;
+        }
+
+        @Override
+        public String toString() {
+            return v + ":" + q;
         }
     }
 }
