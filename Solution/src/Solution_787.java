@@ -55,10 +55,11 @@ public class Solution_787 {
         // 记忆化其实只要记录b就行了，而不用管是从哪个地方来的
         // key dst value : key :路径长度   value 路径大小
 //        Map<Integer, Map<Integer, Integer>> memo = new HashMap<>();
+
+        // memo[][][] 1: 目标节点 2: 路径长度 3： 路径大小
         int[][][] memo = new int[n][n + 1][1];
         //找到所有的路径
         backtrace(dst, K, src, graph.adj[src], trace, visited, graph, memo);
-
 
         if (minTotal == Integer.MAX_VALUE) {
             return -1;
@@ -82,15 +83,19 @@ public class Solution_787 {
         if (tmp >= minTotal) {
             return;
         }
+
+        // 第三次剪枝
+        // 到达当前节点的路径上如果存在比当前的路径短，而且比当前的总和小的进行过滤
+        if (!notInMemo(src,trace,tmp,memo)) {
+            return;
+        }
         // 当当前处理的节点是目标节点时
         if (src == dest) {
             minTotal = Math.min(minTotal, tmp);
             return;
         }
 
-        if (!notInMemo(src,trace,tmp,memo)) {
-            return;
-        }
+
 
         for (LineInfo lineInfo : edgeInfo) {
             // 如果当前的节点没有被访问过
@@ -105,7 +110,7 @@ public class Solution_787 {
         }
     }
 
-    // memo[][][] 1: 目标节点 2: 路径长度 3： 路径大小
+
     private boolean notInMemo(int src, List<LineInfo> trace, int tmp, int[][][] memo) {
         // 先判断当前有没有到过这个节点
         for (int i = 0; i < memo[src].length; i++) {
