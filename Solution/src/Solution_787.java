@@ -67,7 +67,7 @@ public class Solution_787 {
         return minTotal;
     }
 
-    private void backtrace(int dest, int k, int src, int[][] edgeInfo, List<LineInfo> trace,
+    private void backtrace(int dest, int k, int src, List<LineInfo> edgeInfo, List<LineInfo> trace,
                            boolean[][] visited, Graph graph, int[][][] memo) {
         // 如果此时这个序列中的长度 已经 大于了最终的结果值，直接跳过
         // 第一次剪枝
@@ -130,15 +130,19 @@ public class Solution_787 {
     static class Graph {
         // 顶点的个数
         private int v;
-        private int[][][] adj;
+        private LinkedList<LineInfo>[] adj;
 
         public Graph(int v) {
             this.v = v;
-            adj = new int[v][v][1];
+            adj = new LinkedList[v];
+            for (int i =0; i< v;i++) {
+
+                adj[i] = new LinkedList<>();
+            }
         }
 
         public void addEdge(int src, int dest, int q) {
-            adj[src][dest][0] = q;
+            adj[src].add(new LineInfo(dest,q));
         }
 
     }
