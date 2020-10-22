@@ -27,17 +27,65 @@ import java.util.*;
  */
 public class Solution_787 {
     public static void main(String[] args) {
-        int[][] flights = {{0, 1, 5}, {1, 2, 5}, {0, 3, 2}, {3, 1, 2}, {1, 4, 1}, {4, 2, 1}};
-        System.out.println(new Solution_787().findCheapestPrice(5, flights, 0, 2, 2));
+        int[][] flights = {{0,1,1},{0,2,5},{1,2,1},{2,3,1}};
+        System.out.println(new Solution_787().findCheapestPrice(4, flights, 0, 3, 1));
     }
 
 
-    int minTotal = Integer.MAX_VALUE;
 
+
+    public int findCheapestPrice(int n, int[][] flights, int src, int dst, int K) {
+        Graph graph = new Graph(n);
+        // 第一步 先根据给定的数组 构造出这个有向无环加权图
+        for (int i = 0; i < flights.length; i++) {
+            int[] info = flights[i];
+            graph.addEdge(info[0], info[1], info[2]);
+        }
+        // visited[i][j] 表示 i-j 有没有被访问过
+        boolean[][] visited = new boolean[n][n];
+
+        // dp[i][j] 表示从i->j 在转机次数不超过k次的最小距离
+        int[][] dp = new int[n][n];
+
+        Arrays.fill(dp[src],Integer.MAX_VALUE);
+        dp[src][src] = 0;
+
+        // 广度优先遍历
+        Queue<Integer> queue = new ArrayDeque<>();
+        queue.add(src);
+        // 转机的次数
+        int count = 0;
+        while (!queue.isEmpty() && count <= K) {
+            List<Integer> list = new ArrayList<>();
+            while (!queue.isEmpty()) {
+                int tmp = queue.poll();
+                LinkedList<LineInfo> lineInfos = graph.adj[tmp];
+                for (LineInfo lineInfo : lineInfos) {
+                    if (visited[tmp][lineInfo.v]) {
+                        continue;
+                    }
+                    visited[tmp][lineInfo.v] = true;
+                    dp[src][lineInfo.v] = Math.min(dp[src][lineInfo.v], dp[src][tmp] + lineInfo.q);
+                    if (lineInfo.v == dst){
+                        continue;
+                    }
+                    list.add(lineInfo.v);
+                }
+            }
+            count++;
+            queue.addAll(list);
+        }
+        if (dp[src][dst] == Integer.MAX_VALUE) {
+            return -1;
+        }
+        return dp[src][dst];
+    }
+
+    int minTotal = Integer.MAX_VALUE;
     // 就是给定一个有向无环加权图，给定起始点，和终点，找到起始点到终点的所有路径
     // 然后再通过给定的K过滤掉那些不合法的数据
     // 再从合法的数据中找到最短的那条
-    public int findCheapestPrice(int n, int[][] flights, int src, int dst, int K) {
+    public int findCheapestPrice_backtrace(int n, int[][] flights, int src, int dst, int K) {
         Graph graph = new Graph(n);
         // 第一步 先根据给定的数组 构造出这个有向无环加权图
         for (int i = 0; i < flights.length; i++) {
@@ -135,14 +183,14 @@ public class Solution_787 {
         public Graph(int v) {
             this.v = v;
             adj = new LinkedList[v];
-            for (int i =0; i< v;i++) {
+            for (int i = 0; i < v; i++) {
 
                 adj[i] = new LinkedList<>();
             }
         }
 
         public void addEdge(int src, int dest, int q) {
-            adj[src].add(new LineInfo(dest,q));
+            adj[src].add(new LineInfo(dest, q));
         }
 
     }
