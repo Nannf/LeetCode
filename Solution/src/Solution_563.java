@@ -45,13 +45,13 @@ public class Solution_563 {
         }
         if (root.left == null) {
             int val = dfs(root.right);
-            ans += val;
+            ans += Math.abs(val);
             return val + root.val;
         }
 
         if (root.right == null) {
             int val = dfs(root.left);
-            ans += val;
+            ans += Math.abs(val);
             return val + root.val;
         }
 
