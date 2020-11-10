@@ -39,6 +39,8 @@ public class Offer_10_2 {
         if (memo[n - 1] != 0) {
             return memo[n - 1];
         }
+        // 对大于2的任意一个台阶而言，到它的方式只有两种 要么是n-1,要么是n-2
+        // 至于到n-1 和 n-2 分别有几种 不在本次的考虑范围内
         int val = (dfs(n - 1, memo) + dfs(n - 2, memo)) % 1000000007;
         memo[n - 1] = val;
         return val;
