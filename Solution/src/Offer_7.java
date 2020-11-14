@@ -25,10 +25,69 @@ public class Offer_7 {
         }
     }
 
-    // 前序的第一个是根，中序的跟前序的第一个相同之前的为左子树，后面为右子树
-    public TreeNode buildTree(int[] preorder, int[] inorder) {
+    public static void main(String[] args) {
+        int[] pre = {3, 9, 20, 15, 7};
+        int[] in = {9, 3, 15, 20, 7};
+        System.out.println(new Offer_7().buildTree(pre, in));
+    }
 
-        return null;
+
+    // 先找前序的第一个数，记为A，就是根，再在中序中找在A之前的所有的节点，就是左子树，右边的都是右子树，然后两个数组的索引发生变化，中序的索引开始变成A的索引位置加1，
+    // 先序的位置索引变成 中序A值位置之前的数字
+    // 以上就是递归函数的单c
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        if (preorder.length == 0) {
+            return null;
+        }
+        return dfs(preorder, inorder, 0, preorder[preorder.length - 1]);
+    }
+
+    private TreeNode dfs(int[] preorder, int[] inorder, int rootIndex, int parent) {
+        if (rootIndex >= preorder.length) {
+            return null;
+        }
+        TreeNode root = new TreeNode(preorder[rootIndex]);
+        int leftTreeSize = Math.max(getLeftTreeSize(preorder, inorder, rootIndex), 0);
+        if (leftTreeSize > 0) {
+            root.left = dfs(preorder, inorder, rootIndex + 1, preorder[rootIndex]);
+        }
+
+        int rightTreeSize = getRightTreeSize(preorder, inorder, rootIndex, parent);
+        if (rightTreeSize > 0) {
+            root.right = dfs(preorder, inorder, rootIndex + leftTreeSize + 1, preorder[rootIndex]);
+        }
+        return root;
+    }
+
+    private int getRightTreeSize(int[] preorder, int[] inorder, int rootIndex, int parent) {
+        int startIndex = 0;
+        int endIndex = preorder.length;
+
+        for (int i = 0; i < inorder.length; i++) {
+            if (inorder[i] == preorder[rootIndex]) {
+                startIndex = i;
+            }
+            if (inorder[i] == parent) {
+                endIndex = i;
+            }
+        }
+        return endIndex - startIndex - 1;
+
+    }
+
+
+    private int getLeftTreeSize(int[] preorder, int[] inorder, int rootIndex) {
+        int target = preorder[rootIndex];
+        int ans = 0;
+
+        for (int i = 0; i < inorder.length; i++) {
+            if (inorder[i] != target) {
+                ans++;
+            } else {
+                break;
+            }
+        }
+        return ans - rootIndex;
     }
 
 }
