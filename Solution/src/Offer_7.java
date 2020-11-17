@@ -1,3 +1,6 @@
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author Nannf
  * @date 2020/11/10 14:29
@@ -36,58 +39,39 @@ public class Offer_7 {
     // 先序的位置索引变成 中序A值位置之前的数字
     // 以上就是递归函数的单c
     public TreeNode buildTree(int[] preorder, int[] inorder) {
-        if (preorder.length == 0) {
+        if (preorder.length == 0 || inorder.length == 0 || preorder.length != inorder.length) {
             return null;
         }
-        return dfs(preorder, inorder, 0, preorder[preorder.length - 1]);
+        Map<Integer, Integer> indexMap = new HashMap<>();
+        for (int i = 0; i < inorder.length; i++) {
+            indexMap.put(inorder[i], i);
+        }
+        return dfs(preorder, 0, preorder.length - 1, inorder, 0, preorder.length - 1, indexMap);
     }
 
-    private TreeNode dfs(int[] preorder, int[] inorder, int rootIndex, int parent) {
-        if (rootIndex >= preorder.length) {
+    // 每次只构造一个节点，然后判断其左孩子和右孩子的下标位置
+    private TreeNode dfs(int[] preorder, int pStart, int pEnd, int[] inorder, int iStart, int iEnd, Map<Integer, Integer> indexMap) {
+
+        if (pStart > pEnd || pStart >= preorder.length) {
             return null;
         }
-        TreeNode root = new TreeNode(preorder[rootIndex]);
-        int leftTreeSize = Math.max(getLeftTreeSize(preorder, inorder, rootIndex), 0);
-        if (leftTreeSize > 0) {
-            root.left = dfs(preorder, inorder, rootIndex + 1, preorder[rootIndex]);
+        TreeNode root = new TreeNode(preorder[pStart]);
+        if (pStart == pEnd) {
+            return root;
         }
+        // 根节点所在的下标索引
+        int rootIndex = indexMap.get(preorder[pStart]);
+        // 左孩子的个数
+        int leftSize = rootIndex - iStart;
+        // 右孩子的个数
+        int rightSize = iEnd - rootIndex;
 
-        int rightTreeSize = getRightTreeSize(preorder, inorder, rootIndex, parent);
-        if (rightTreeSize > 0) {
-            root.right = dfs(preorder, inorder, rootIndex + leftTreeSize + 1, preorder[rootIndex]);
-        }
+        TreeNode leftChild = dfs(preorder, pStart + 1, pStart +leftSize, inorder, iStart, rootIndex - 1, indexMap);
+        TreeNode rightChild = dfs(preorder, pStart + leftSize + 1, pStart + leftSize + rightSize, inorder, rootIndex + 1, rootIndex  + rightSize, indexMap);
+        root.left = leftChild;
+        root.right = rightChild;
         return root;
     }
 
-    private int getRightTreeSize(int[] preorder, int[] inorder, int rootIndex, int parent) {
-        int startIndex = 0;
-        int endIndex = preorder.length;
-
-        for (int i = 0; i < inorder.length; i++) {
-            if (inorder[i] == preorder[rootIndex]) {
-                startIndex = i;
-            }
-            if (inorder[i] == parent) {
-                endIndex = i;
-            }
-        }
-        return endIndex - startIndex - 1;
-
-    }
-
-
-    private int getLeftTreeSize(int[] preorder, int[] inorder, int rootIndex) {
-        int target = preorder[rootIndex];
-        int ans = 0;
-
-        for (int i = 0; i < inorder.length; i++) {
-            if (inorder[i] != target) {
-                ans++;
-            } else {
-                break;
-            }
-        }
-        return ans - rootIndex;
-    }
 
 }
