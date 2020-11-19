@@ -13,46 +13,36 @@ import java.util.Arrays;
  */
 public class Solution_283 {
     public static void main(String[] args) {
-        int[] nums = {-1, 1, 0, 3, 12};
+        int[] nums = {-1, -11, 0, 0, 12};
         new Solution_283().moveZeroes(nums);
         for (int i = 0; i < nums.length; i++) {
             System.out.println(nums[i]);
         }
     }
 
+    // 先对数组进行排序，使非零元素相对有序
+    // 题干中没有声明说都是自然数，我们需要考虑负数的情况
+    // 理解错了，不是把不是0的元素从小到大排列
     public void moveZeroes(int[] nums) {
-        // 先对数组进行排序，使非零元素相对有序
-        // 题干中没有声明说都是自然数，我们需要考虑负数的情况
-        int[] firstZeroIndexAndZeroNum = findFirstZeroIndex(nums);
-        if (firstZeroIndexAndZeroNum[0] == -1) {
-            return;
-        }
-        Arrays.sort(nums);
-        int firstNotZeroIndex = firstZeroIndexAndZeroNum[0] + firstZeroIndexAndZeroNum[1];
-        System.arraycopy(nums, firstNotZeroIndex,
-                nums, firstZeroIndexAndZeroNum[0], nums.length - firstNotZeroIndex);
-        Arrays.fill(nums, nums.length - firstZeroIndexAndZeroNum[1], nums.length, 0);
-    }
-
-
-    private int[] findFirstZeroIndex(int[] nums) {
-        int[] ans = new int[2];
-        int smallThanZeroCount = 0;
-        int zeroCount = 0;
-        for (int i = 0; i < nums.length; i++) {
-            if (nums[i] < 0) {
-                smallThanZeroCount++;
-            }
+        int i = 0;
+        int j = i + 1;
+        while (j < nums.length) {
             if (nums[i] == 0) {
-                zeroCount++;
+                if (nums[j] != 0) {
+                    nums[i] = nums[j];
+                    nums[j] = 0;
+                    i++;
+                    j++;
+                } else {
+                    j++;
+                }
+            } else {
+                i++;
+                j++;
             }
         }
-        if (zeroCount == 0) {
-            ans[0] = -1;
-            return ans;
-        }
-        ans[0] = smallThanZeroCount;
-        ans[1] = zeroCount;
-        return ans;
+
     }
+
+
 }
