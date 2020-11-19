@@ -18,7 +18,7 @@
  */
 public class Solution_50 {
     public static void main(String[] args) {
-        System.out.println(new Solution_50().myPow(2.10000, 3));
+        System.out.println(new Solution_50().myPow(3, 5));
     }
 
     public double myPow(double x, int n) {
