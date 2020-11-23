@@ -38,7 +38,49 @@
  * nums 按递增顺序排列
  */
 public class Solution_80 {
+
+    public static void main(String[] args) {
+        new Solution_80().removeDuplicates(new int[]{0,0,1,1,1,1,2,3,3});
+    }
+
     public int removeDuplicates(int[] nums) {
-        return -1;
+        // 先处理边界情况
+        if (nums.length <= 2) {
+            return nums.length;
+        }
+        int delCount = 0;
+        // 感觉可以先标记，再清除
+        boolean[] del = new boolean[nums.length];
+        int count = 1;
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] == nums[i - 1]) {
+                count++;
+                if (count > 2) {
+                    delCount++;
+                    del[i] = true;
+                }
+            } else {
+                count = 1;
+            }
+        }
+        int i = 2;
+        int j = 3;
+        while (j < nums.length) {
+            if (del[i]) {
+                if (!del[j]) {
+                    nums[i] = nums[j];
+                    del[j] = true;
+                    i++;
+                    j++;
+                } else {
+                    j++;
+                }
+            } else {
+                i++;
+                j++;
+            }
+        }
+
+        return nums.length - delCount;
     }
 }
