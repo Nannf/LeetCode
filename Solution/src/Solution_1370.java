@@ -59,11 +59,15 @@ public class Solution_1370 {
     public String sortString(String s) {
         List<Integer> ans = new ArrayList<>();
         boolean[] visited = new boolean[s.length()];
-        dfs(ans, visited, s, 0);
-        return ans.toString();
+        dfs(ans, visited, s, 0, false);
+        StringBuilder result = new StringBuilder();
+        for (int i : ans) {
+            result.append(s.charAt(i));
+        }
+        return result.toString();
     }
 
-    private void dfs(List<Integer> ans, boolean[] visited, String s, int i) {
+    private void dfs(List<Integer> ans, boolean[] visited, String s, int i, boolean isChange) {
         if (endFlag) {
             return;
         }
@@ -78,30 +82,61 @@ public class Solution_1370 {
             // 找到s中所有的未被访问的最小的那个索引
             for (int j = 0; j < s.length(); j++) {
                 if (!visited[j] && s.charAt(j) <= s.charAt(index)) {
-                    index = j;
+                    if (isChange) {
+                        index = j;
+                    } else {
+                        if (ans.size() == 0 || s.charAt(j) != s.charAt(ans.get(ans.size() - 1))) {
+                            index = j;
+                        }
+                    }
+
                 }
             }
-            if (ans.size() == 0 || s.charAt(index) > s.charAt(ans.get(ans.size() - 1))) {
+            if (ans.size() == 0) {
                 ans.add(index);
                 visited[index] = true;
-                dfs(ans, visited, s, i);
+                dfs(ans, visited, s, i, false);
             } else {
-                dfs(ans, visited, s, map.get(i));
+                if (!isChange) {
+                    if (s.charAt(index) > s.charAt(ans.get(ans.size() - 1))) {
+                        ans.add(index);
+                        visited[index] = true;
+                        dfs(ans, visited, s, i, false);
+                    } else {
+                        dfs(ans, visited, s, map.get(i), true);
+                    }
+                } else {
+                    ans.add(index);
+                    visited[index] = true;
+                    dfs(ans, visited, s, i, false);
+                }
             }
         } else {
             // 找最大的索引
-            // 找到s中所有的未被访问的最小的那个索引
             for (int j = 0; j < s.length(); j++) {
                 if (!visited[j] && s.charAt(j) >= s.charAt(index)) {
-                    index = j;
+                    if (isChange) {
+                        index = j;
+                    } else {
+                        if (s.charAt(j) != s.charAt(ans.get(ans.size() - 1))) {
+                            index = j;
+                        }
+                    }
                 }
             }
-            if (ans.size() == 0 || s.charAt(index) < s.charAt(ans.get(ans.size() - 1))) {
+
+            if (isChange) {
                 ans.add(index);
                 visited[index] = true;
-                dfs(ans, visited, s, i);
+                dfs(ans, visited, s, i, false);
             } else {
-                dfs(ans, visited, s, map.get(i));
+                if (s.charAt(index) < s.charAt(ans.get(ans.size() - 1))) {
+                    ans.add(index);
+                    visited[index] = true;
+                    dfs(ans, visited, s, i, false);
+                } else {
+                    dfs(ans, visited, s, map.get(i), true);
+                }
             }
         }
     }
