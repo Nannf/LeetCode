@@ -43,7 +43,7 @@ import java.util.Map;
 public class Solution_1370 {
 
     public static void main(String[] args) {
-        System.out.println(new Solution_1370().sortString("leetcode"));
+        System.out.println(new Solution_1370().sortString("aaaabbbbcccc"));
     }
 
     static Map<Integer, Integer> map = new HashMap<>();
@@ -78,66 +78,81 @@ public class Solution_1370 {
         }
 
         int index = findFirstNotVisitedIndex(visited);
+        Integer integer = null;
         if (i == 0) {
-            // 找到s中所有的未被访问的最小的那个索引
-            for (int j = 0; j < s.length(); j++) {
-                if (!visited[j] && s.charAt(j) <= s.charAt(index)) {
-                    if (isChange) {
+            boolean isFind = false;
+            // 当这个状态是从0迁移过来的时候，我们需要找的是所有没被访问过的，且比上一个大的元素
+            // 如果是从1迁移过来，就从所有未访问过的元素中查找出最小的那个元素的索引
+            if (isChange || ans.size() == 0) {
+                // 这种情况是查找最小的那个索引
+                for (int j = 0; j < s.length(); j++) {
+                    if (!visited[j] && s.charAt(j) <= s.charAt(index)) {
+                        isFind = true;
                         index = j;
-                    } else {
-                        if (ans.size() == 0 || s.charAt(j) != s.charAt(ans.get(ans.size() - 1))) {
-                            index = j;
-                        }
                     }
+                }
+            } else {
 
+                // 当这个状态是从0迁移过来的时候，我们需要找的是所有没被访问过的，且比上一个大的元素
+                for (int j = 0; j < s.length(); j++) {
+                    if (!visited[j] && s.charAt(j) > s.charAt(ans.get(ans.size() - 1))) {
+                        if (integer == null) {
+                            isFind = true;
+                            integer = j;
+                        } else {
+                            if (s.charAt(j) <= s.charAt(integer)) {
+                                integer = j;
+                            }
+                        }
+
+
+                    }
                 }
             }
-            if (ans.size() == 0) {
-                ans.add(index);
-                visited[index] = true;
+            int finalIndex = integer == null ? index : integer;
+            if (isFind) {
+                ans.add(finalIndex);
+                visited[finalIndex] = true;
                 dfs(ans, visited, s, i, false);
             } else {
-                if (!isChange) {
-                    if (s.charAt(index) > s.charAt(ans.get(ans.size() - 1))) {
-                        ans.add(index);
-                        visited[index] = true;
-                        dfs(ans, visited, s, i, false);
-                    } else {
-                        dfs(ans, visited, s, map.get(i), true);
-                    }
-                } else {
-                    ans.add(index);
-                    visited[index] = true;
-                    dfs(ans, visited, s, i, false);
-                }
+                dfs(ans, visited, s, map.get(i), true);
             }
+
         } else {
-            // 找最大的索引
-            for (int j = 0; j < s.length(); j++) {
-                if (!visited[j] && s.charAt(j) >= s.charAt(index)) {
-                    if (isChange) {
+            // 如果当前是1 表示我们要找最大的
+            // 如果是从1这个状态迁移过来，我们需要再剩余的未访问过的索引中找到最大的，且比ans中上一个索引小的
+            // 如果是从0这个状态迁移过来，无脑找最大
+            boolean isFind = false;
+            if (isChange) {
+                for (int j = 0; j < s.length(); j++) {
+                    if (!visited[j] && s.charAt(j) >= s.charAt(index)) {
+                        isFind = true;
                         index = j;
-                    } else {
-                        if (s.charAt(j) != s.charAt(ans.get(ans.size() - 1))) {
-                            index = j;
+                    }
+                }
+            } else {
+                for (int j = 0; j < s.length(); j++) {
+                    if (!visited[j] && s.charAt(j) < s.charAt(ans.get(ans.size() - 1))) {
+                        if (integer == null) {
+                            isFind = true;
+                            integer = j;
+                        } else {
+                            if (s.charAt(j) > s.charAt(integer)) {
+                                integer = j;
+                            }
                         }
                     }
                 }
             }
-
-            if (isChange) {
-                ans.add(index);
-                visited[index] = true;
+            int finalIndex = integer == null ? index : integer;
+            if (isFind) {
+                ans.add(finalIndex);
+                visited[finalIndex] = true;
                 dfs(ans, visited, s, i, false);
             } else {
-                if (s.charAt(index) < s.charAt(ans.get(ans.size() - 1))) {
-                    ans.add(index);
-                    visited[index] = true;
-                    dfs(ans, visited, s, i, false);
-                } else {
-                    dfs(ans, visited, s, map.get(i), true);
-                }
+                dfs(ans, visited, s, map.get(i), true);
             }
+
         }
     }
 
