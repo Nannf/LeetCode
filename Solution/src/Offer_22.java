@@ -23,8 +23,28 @@ public class Offer_22 {
         }
     }
 
-    // 暴力解法，先暴力第一遍，把所有的节点和索引信息放在hash表中，然后直接获取，
+    // 可以使用快慢指针 一个指针比另一个指针提前走k步，当快指针走到结束的时候，慢指针所指的位置就是我们要求的节点
     public ListNode getKthFromEnd(ListNode head, int k) {
+        ListNode slow = head;
+        ListNode fast = head;
+        int i = k;
+        while (i > 0) {
+            fast = fast.next;
+            i--;
+        }
+        if (fast == null) {
+            return slow;
+        }
+        while (fast.next != null) {
+            fast = fast.next;
+            slow = slow.next;
+        }
+        return slow.next;
+    }
+
+
+    // 暴力解法，先暴力第一遍，把所有的节点和索引信息放在hash表中，然后直接获取，
+    public ListNode getKthFromEnd_HashTable(ListNode head, int k) {
         Map<Integer, ListNode> indexInfo = new HashMap<>();
         // count 的最终值就是链表的长度
         // 假设 长度为6 count = 6, 倒数第二个就是 6-2 下标索引是4的
