@@ -1,5 +1,8 @@
 package thread;
 
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * @author Nannf
  * @date 2021/6/21 10:30
@@ -36,38 +39,49 @@ public class Solution_1114 {
     class Foo {
         public Foo() {
         }
+        private final ReentrantLock lock = new ReentrantLock();
+        Condition waitFirstCondition = lock.newCondition();
+        Condition waitSecondCondition = lock.newCondition();
+        volatile boolean isFirstRun = false;
+        volatile boolean isSecondRun = false;
 
-        volatile boolean firstDeal = false;
-        volatile boolean secondDeal = false;
 
         public void first(Runnable printFirst) throws InterruptedException {
-            synchronized (Foo.class) {
+            try {
+                lock.lock();
                 printFirst.run();
-                firstDeal = true;
-                Foo.class.notifyAll();
+                isFirstRun = true;
+                waitFirstCondition.signalAll();
+            }finally {
+                lock.unlock();
             }
         }
 
         public void second(Runnable printSecond) throws InterruptedException {
-            synchronized (Foo.class) {
-                while (!firstDeal) {
-                    Foo.class.wait();
+            try {
+                lock.lock();
+                while (!isFirstRun) {
+                    waitFirstCondition.await();
                 }
-                    printSecond.run();
-                    secondDeal = true;
-                    Foo.class.notifyAll();
-
+                printSecond.run();
+                isSecondRun = true;
+                waitSecondCondition.signalAll();
+            }finally {
+                lock.unlock();
             }
+
+
         }
 
         public void third(Runnable printThird) throws InterruptedException {
-            synchronized (Foo.class) {
-                while (!secondDeal) {
-                    Foo.class.wait();
+            try {
+                lock.lock();
+                while (!isSecondRun) {
+                    waitSecondCondition.await();
                 }
                 printThird.run();
-
-
+            }finally {
+                lock.unlock();
             }
         }
     }

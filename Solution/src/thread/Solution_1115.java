@@ -54,6 +54,7 @@ public class Solution_1115 {
         public void foo(Runnable printFoo) throws InterruptedException {
             for (int i = 0; i < n; i++) {
                 try {
+                    waitBarCondition.wait();
                     lock.lock();
                     while (!alreadyBar) {
                         waitFooCondition.await();
