@@ -115,6 +115,7 @@ public class Solution_1116 {
                     kk.getAndIncrement();
                     printNum.getAndIncrement();
                     oddCondition.signalAll();
+                    zeroCondition.await();
                 } else {
                     // 只有技术的时候才需要打印
                     while (kk.get() % 2 == 0) {
@@ -130,8 +131,10 @@ public class Solution_1116 {
 
                     if (printNum.get() % 2 != 0) {
                         oddCondition.signalAll();
+                        zeroCondition.await();
                     } else {
                         evenCondition.signalAll();
+                        zeroCondition.await();
                     }
 
                 }
