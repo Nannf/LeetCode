@@ -38,7 +38,7 @@ import java.util.function.IntConsumer;
 public class Solution_1116 {
 
     public static void main(String[] args) {
-        ZeroEvenOdd zeroEvenOdd = new ZeroEvenOdd(2);
+        ZeroEvenOdd zeroEvenOdd = new ZeroEvenOdd(4);
         IntConsumer intConsumer = new IntConsumer() {
             @Override
             public void accept(int value) {
@@ -46,34 +46,28 @@ public class Solution_1116 {
             }
         };
         Thread t1 = new Thread(() -> {
-            while (true) {
                 try {
                     zeroEvenOdd.zero(intConsumer);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
         });
 
 
         Thread t2 = new Thread(() -> {
-            while (true) {
                 try {
                     zeroEvenOdd.odd(intConsumer);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
         });
 
         Thread t3 = new Thread(() -> {
-            while (true) {
                 try {
                     zeroEvenOdd.even(intConsumer);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
         });
         t1.start();
         t2.start();
@@ -88,12 +82,12 @@ public class Solution_1116 {
         AtomicInteger count;
         // 这个是用来打印的，只有打印0的时候，才会增加
         AtomicInteger printNum = new AtomicInteger(0);
-        // 这个是判断是不是打印0的，这个初始是1，是奇数的时候会打印0
-        AtomicInteger kk = new AtomicInteger(1);
 
         ReentrantLock lock = new ReentrantLock();
 
         volatile boolean first = true;
+
+        volatile  boolean isZero = false;
         Condition zeroCondition = lock.newCondition();
         Condition oddCondition = lock.newCondition();
         Condition evenCondition = lock.newCondition();
@@ -105,85 +99,104 @@ public class Solution_1116 {
 
         // printNumber.accept(x) outputs "x", where x is an integer.
         public void zero(IntConsumer printNumber) throws InterruptedException {
-            try {
-                lock.lock();
-                if (first) {
-                    printNumber.accept(0);
-                    first = false;
-
-                    count.getAndDecrement();
-                    kk.getAndIncrement();
-                    printNum.getAndIncrement();
-                    oddCondition.signalAll();
-                    zeroCondition.await();
-                } else {
-                    // 只有技术的时候才需要打印
-                    while (kk.get() % 2 == 0) {
-                        zeroCondition.await();
-                    }
-                    printNumber.accept(0);
-                    count.decrementAndGet();
-
-                    if (count.get() == 0) {
-                        return;
-                    }
-                    printNum.getAndIncrement();
-
-                    if (printNum.get() % 2 != 0) {
+            for (int i = 0; i < n; i++) {
+                try {
+                    lock.lock();
+                    // 如果是刚开始执行，只有zero可以运行
+                    if (first) {
+                        // 先打印一个0
+                        printNumber.accept(0);
+                        // 总数减一
+                        count.getAndDecrement();
+                        // 打印的值加一
+                        printNum.getAndIncrement();
+                        // 把第一次的去掉
+                        first = false;
+                        isZero = true;
+                        System.out.println("我是0，我释放了奇数的锁");
                         oddCondition.signalAll();
-                        zeroCondition.await();
                     } else {
-                        evenCondition.signalAll();
-                        zeroCondition.await();
-                    }
+                        while (isZero) {
+                            System.out.println("我是0，我把自己锁了");
+                            zeroCondition.await();
+                        }
+                        // 只打印0
+                        printNumber.accept(0);
+                        isZero = true;
 
+                        // count的值减一
+                        count.decrementAndGet();
+                        if (count.get() <= 0) {
+                            return;
+                        }
+
+                        if (printNum.get() % 2 != 0) {
+                            System.out.println("我是0，我释放了奇数的锁");
+                            oddCondition.signalAll();
+                        } else {
+                            System.out.println("我是0，我释放了偶数的锁");
+                            evenCondition.signalAll();
+                        }
+
+                    }
+                } finally {
+                    lock.unlock();
                 }
-            } finally {
-                lock.unlock();
             }
+
         }
 
         public void even(IntConsumer printNumber) throws InterruptedException {
-            try {
-                lock.lock();
-                while (first) {
-                    evenCondition.await();
-                }
-                while (printNum.get() % 2 != 0) {
-                    evenCondition.await();
-                }
+            for (int i = 0; i < n; i++) {
+                try {
+                    lock.lock();
+                    while (first) {
+                        System.out.println("我是偶数，我因为first锁了自己");
+                        evenCondition.await();
+                    }
+                    while (printNum.get() % 2 != 0 || !isZero) {
+                        System.out.println("我是偶数，我因为printNum锁了自己");
+                        evenCondition.await();
+                    }
 
-                printNumber.accept(printNum.get());
-                count.decrementAndGet();
-                if (count.get() == 0) {
-                    return;
+                    printNumber.accept(printNum.getAndIncrement());
+                    count.decrementAndGet();
+                    if (count.get() <= 0) {
+                        return;
+                    }
+                    System.out.println("我是偶数，我释放了0");
+                    isZero = false;
+                    zeroCondition.signalAll();
+                } finally {
+                    lock.unlock();
                 }
-                kk.getAndIncrement();
-                zeroCondition.signalAll();
-            } finally {
-                lock.unlock();
             }
         }
 
         public void odd(IntConsumer printNumber) throws InterruptedException {
-            try {
-                lock.lock();
-                while (first) {
-                    oddCondition.await();
-                }
-                while (printNum.get() % 2 == 0) {
-                    oddCondition.await();
-                }
+            for (int i = 0; i < n; i++) {
+                try {
+                    lock.lock();
+                    while (first) {
+                        System.out.println("我是奇数，我因为first锁了自己");
+                        oddCondition.await();
+                    }
+                    while (printNum.get() % 2 == 0 || !isZero) {
+                        System.out.println("我是奇数，我因为printNum锁了自己");
+                        oddCondition.await();
+                    }
 
-                printNumber.accept(printNum.get());
-                count.decrementAndGet();
-                if (count.get() == 0) {
-                    return;
+                    printNumber.accept(printNum.getAndIncrement());
+                    count.decrementAndGet();
+                    if (count.get() <= 0) {
+                        return;
+                    }
+                    System.out.println("我是奇数，我释放了0");
+                    isZero=false;
+                    zeroCondition.signalAll();
+                } finally {
+                    lock.unlock();
                 }
-                kk.getAndIncrement();
-                zeroCondition.signalAll();
-            } finally {
-                lock.unlock();
             }
         }
     }
