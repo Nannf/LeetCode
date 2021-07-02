@@ -154,6 +154,7 @@ public class Solution_1116 {
                         System.out.println("我是偶数，我因为first锁了自己");
                         evenCondition.await();
                     }
+                    // 这地方必须加 isZero，不然如果这个地方调度的比较慢的话，可能会直接通过，造成 012这样的输出序列
                     while (printNum.get() % 2 != 0 || !isZero) {
                         System.out.println("我是偶数，我因为printNum锁了自己");
                         evenCondition.await();
