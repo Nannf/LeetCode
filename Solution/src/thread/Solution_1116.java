@@ -1,8 +1,6 @@
 package thread;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.Semaphore;
 import java.util.function.IntConsumer;
 
 /**
@@ -46,28 +44,28 @@ public class Solution_1116 {
             }
         };
         Thread t1 = new Thread(() -> {
-                try {
-                    zeroEvenOdd.zero(intConsumer);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            try {
+                zeroEvenOdd.zero(intConsumer);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
 
 
         Thread t2 = new Thread(() -> {
-                try {
-                    zeroEvenOdd.odd(intConsumer);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            try {
+                zeroEvenOdd.odd(intConsumer);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
 
         Thread t3 = new Thread(() -> {
-                try {
-                    zeroEvenOdd.even(intConsumer);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            try {
+                zeroEvenOdd.even(intConsumer);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
         t1.start();
         t2.start();
@@ -78,126 +76,47 @@ public class Solution_1116 {
     static class ZeroEvenOdd {
         private int n;
 
-        // 这个是用来结束循环的
-        AtomicInteger count;
-        // 这个是用来打印的，只有打印0的时候，才会增加
-        AtomicInteger printNum = new AtomicInteger(0);
+        int printNum = 0;
 
-        ReentrantLock lock = new ReentrantLock();
-
-        volatile boolean first = true;
-
-        volatile  boolean isZero = false;
-        Condition zeroCondition = lock.newCondition();
-        Condition oddCondition = lock.newCondition();
-        Condition evenCondition = lock.newCondition();
+        Semaphore zeroSema = new Semaphore(1);
+        Semaphore oddSema = new Semaphore(0);
+        Semaphore evenSema = new Semaphore(0);
 
         public ZeroEvenOdd(int n) {
             this.n = n;
-            count = new AtomicInteger(n * 2);
         }
 
         // printNumber.accept(x) outputs "x", where x is an integer.
         public void zero(IntConsumer printNumber) throws InterruptedException {
             for (int i = 0; i < n; i++) {
-                try {
-                    lock.lock();
-                    // 如果是刚开始执行，只有zero可以运行
-                    if (first) {
-                        // 先打印一个0
-                        printNumber.accept(0);
-                        // 总数减一
-                        count.getAndDecrement();
-                        // 打印的值加一
-                        printNum.getAndIncrement();
-                        // 把第一次的去掉
-                        first = false;
-                        isZero = true;
-                        System.out.println("我是0，我释放了奇数的锁");
-                        oddCondition.signalAll();
-                    } else {
-                        while (isZero) {
-                            System.out.println("我是0，我把自己锁了");
-                            zeroCondition.await();
-                        }
-                        // 只打印0
-                        printNumber.accept(0);
-                        isZero = true;
-
-                        // count的值减一
-                        count.decrementAndGet();
-                        if (count.get() <= 0) {
-                            return;
-                        }
-
-                        if (printNum.get() % 2 != 0) {
-                            System.out.println("我是0，我释放了奇数的锁");
-                            oddCondition.signalAll();
-                        } else {
-                            System.out.println("我是0，我释放了偶数的锁");
-                            evenCondition.signalAll();
-                        }
-
-                    }
-                } finally {
-                    lock.unlock();
+                zeroSema.acquire();
+                // 先打印一个0
+                printNumber.accept(0);
+                // 打印的值加一
+                printNum++;
+                if (printNum % 2 != 0) {
+                    oddSema.release();
+                } else {
+                    evenSema.release();
                 }
-            }
 
+            }
         }
+
 
         public void even(IntConsumer printNumber) throws InterruptedException {
             for (int i = 0; i < n; i++) {
-                try {
-                    lock.lock();
-                    while (first) {
-                        System.out.println("我是偶数，我因为first锁了自己");
-                        evenCondition.await();
-                    }
-                    // 这地方必须加 isZero，不然如果这个地方调度的比较慢的话，可能会直接通过，造成 012这样的输出序列
-                    while (printNum.get() % 2 != 0 || !isZero) {
-                        System.out.println("我是偶数，我因为printNum锁了自己");
-                        evenCondition.await();
-                    }
-
-                    printNumber.accept(printNum.getAndIncrement());
-                    count.decrementAndGet();
-                    if (count.get() <= 0) {
-                        return;
-                    }
-                    System.out.println("我是偶数，我释放了0");
-                    isZero = false;
-                    zeroCondition.signalAll();
-                } finally {
-                    lock.unlock();
-                }
+                evenSema.acquire();
+                printNumber.accept(printNum);
+                zeroSema.release();
             }
         }
 
         public void odd(IntConsumer printNumber) throws InterruptedException {
             for (int i = 0; i < n; i++) {
-                try {
-                    lock.lock();
-                    while (first) {
-                        System.out.println("我是奇数，我因为first锁了自己");
-                        oddCondition.await();
-                    }
-                    while (printNum.get() % 2 == 0 || !isZero) {
-                        System.out.println("我是奇数，我因为printNum锁了自己");
-                        oddCondition.await();
-                    }
-
-                    printNumber.accept(printNum.getAndIncrement());
-                    count.decrementAndGet();
-                    if (count.get() <= 0) {
-                        return;
-                    }
-                    System.out.println("我是奇数，我释放了0");
-                    isZero=false;
-                    zeroCondition.signalAll();
-                } finally {
-                    lock.unlock();
-                }
+                oddSema.acquire();
+                printNumber.accept(printNum);
+                zeroSema.release();
             }
         }
     }
