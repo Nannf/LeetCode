@@ -76,7 +76,6 @@ public class Solution_1116 {
     static class ZeroEvenOdd {
         private int n;
 
-        int printNum = 0;
 
         Semaphore zeroSema = new Semaphore(1);
         Semaphore oddSema = new Semaphore(0);
@@ -88,13 +87,12 @@ public class Solution_1116 {
 
         // printNumber.accept(x) outputs "x", where x is an integer.
         public void zero(IntConsumer printNumber) throws InterruptedException {
-            for (int i = 0; i < n; i++) {
+            for (int i = 1; i <= n; i++) {
                 zeroSema.acquire();
                 // 先打印一个0
                 printNumber.accept(0);
                 // 打印的值加一
-                printNum++;
-                if (printNum % 2 != 0) {
+                if (i % 2 != 0) {
                     oddSema.release();
                 } else {
                     evenSema.release();
@@ -105,17 +103,19 @@ public class Solution_1116 {
 
 
         public void even(IntConsumer printNumber) throws InterruptedException {
-            for (int i = 0; i < n; i++) {
+            for (int i = 2; i <= n; ) {
                 evenSema.acquire();
-                printNumber.accept(printNum);
+                printNumber.accept(i);
+                i = i + 2;
                 zeroSema.release();
             }
         }
 
         public void odd(IntConsumer printNumber) throws InterruptedException {
-            for (int i = 0; i < n; i++) {
+            for (int i = 1; i <= n; ) {
                 oddSema.acquire();
-                printNumber.accept(printNum);
+                printNumber.accept(i);
+                i = i + 2;
                 zeroSema.release();
             }
         }
