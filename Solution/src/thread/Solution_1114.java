@@ -1,5 +1,6 @@
 package thread;
 
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -36,8 +37,49 @@ import java.util.concurrent.locks.ReentrantLock;
  * 就是无论我怎么调用，方法二的执行必须在方法一之后，可以通过等待-通知
  */
 public class Solution_1114 {
+
     class Foo {
+
+        Semaphore firstSema = new Semaphore(1);
+        Semaphore secondSema = new Semaphore(0);
+        Semaphore thirdSema = new Semaphore(0);
         public Foo() {
+
+        }
+
+        public void first(Runnable printFirst) throws InterruptedException {
+            firstSema.acquire();
+            printFirst.run();
+            secondSema.release();
+            firstSema.release();
+        }
+
+        public void second(Runnable printSecond) throws InterruptedException {
+            secondSema.acquire();
+            printSecond.run();
+            thirdSema.release();
+            secondSema.release();
+        }
+
+        public void third(Runnable printThird) throws InterruptedException {
+            thirdSema.acquire();
+            printThird.run();
+            thirdSema.release();
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+    class Foo2 {
+        public Foo2() {
         }
         private final ReentrantLock lock = new ReentrantLock();
         Condition waitFirstCondition = lock.newCondition();
