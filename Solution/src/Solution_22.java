@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,8 +21,14 @@ import java.util.List;
  */
 public class Solution_22 {
 
+    // 这个用回溯很好解决
     public List<String> generateParenthesis(int n) {
+        List<String> ans = new ArrayList<>();
 
-        return null;
+        backtrace(ans,0,n);
+        return ans;
+    }
+
+    private void backtrace(List<String> ans, int i, int n) {
     }
 }
